@@ -16,7 +16,7 @@
 
 
 -- Volcando estructura de base de datos para api_turnos
-CREATE DATABASE IF NOT EXISTS `api_turnos` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+CREATE DATABASE IF NOT EXISTS `api_turnos` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `api_turnos`;
 
 -- Volcando estructura para tabla api_turnos.admins
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `admins` (
   `rol` enum('admin','superadmin') NOT NULL,
   `status` enum('activo','inactivo') DEFAULT 'activo',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -35,9 +35,9 @@ CREATE TABLE IF NOT EXISTS `admins` (
 CREATE TABLE IF NOT EXISTS `cajas` (
   `id_caja` int NOT NULL AUTO_INCREMENT,
   `numero` int DEFAULT NULL,
-  `estado` enum('online','offline') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT 'offline',
+  `estado` enum('online','offline') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'offline',
   PRIMARY KEY (`id_caja`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS `creditos` (
   PRIMARY KEY (`numero_carga`) USING BTREE,
   KEY `user_id` (`user_id`) USING BTREE,
   CONSTRAINT `creditos_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS `turnos` (
   `id_user` int DEFAULT NULL,
   `user_name` varchar(255) DEFAULT NULL,
   `motivo` varchar(255) DEFAULT NULL,
-  `status` enum('pendiente','en_curso','completado','cancelado') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT 'pendiente',
+  `status` enum('pendiente','en_curso','completado','cancelado') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'pendiente',
   `caja` int DEFAULT NULL,
   `fecha` date DEFAULT NULL,
   `cod_reserva` varchar(50) DEFAULT NULL,
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS `turnos` (
   PRIMARY KEY (`id`),
   KEY `id_user` (`id_user`),
   CONSTRAINT `turnos_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=98 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=98 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `puesto` bigint DEFAULT NULL,
   `redes_sociales` json DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- La exportación de datos fue deseleccionada.
 
