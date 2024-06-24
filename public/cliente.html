@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pantalla de Clientes</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Incluir socket.io desde CDN -->
+    <script type="module" src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 80%;
+            border: 1px solid #ccc;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+        .sidebar {
+            flex: 1;
+            margin-right: 20px;
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .video-container {
+            width: 100%;
+            max-width: 400px;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .mensaje-llamado {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            z-index: 1000;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const socket = io();
+
+            socket.on('connect', () => {
+                console.log('Conectado al servidor');
+            });
+
+            socket.on('turnos-actuales', (turnos) => {
+                const pendientesContainer = document.getElementById('turnosCola');
+
+                pendientesContainer.innerHTML = '';
+
+                turnos.forEach(turno => {
+                    if (turno.status === 'pendiente') {
+                        const turnoElement = document.createElement('li');
+                        turnoElement.textContent = `Turno: ${turno.cod_reserva}`;
+                        pendientesContainer.appendChild(turnoElement);
+                    }
+                });
+            });
+
+            socket.on('turn-called', (data) => {
+                mostrarMensaje(`Turno ${data.N_ticket} llamado`);
+            });
+
+            function mostrarMensaje(mensaje) {
+                const mensajeElement = document.createElement('div');
+                mensajeElement.textContent = mensaje;
+                mensajeElement.classList.add('mensaje-llamado');
+                document.body.appendChild(mensajeElement);
+
+                setTimeout(() => {
+                    mensajeElement.remove();
+                }, 3000); // Ocultar mensaje después de 3 segundos
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <h2>Turnos en Espera</h2>
+            <ul id="turnosCola">
+                <!-- Aquí se renderizarán los turnos en cola -->
+            </ul>
+        </aside>
+        <main class="main-content">
+            <div class="video-container">
+                <video id="videoPlayer" class="videoPlayer" controls autoplay>
+                    <source src="./REEL 1 MINUTO3.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </main>
+    </div>
+    <footer class="footer">
+        <div class="slider">
+            <!-- Aquí se renderizarán las imágenes de publicidad -->
+            <img src="ad1.jpg" alt="Ad 1">
+            <img src="ad2.jpg" alt="Ad 2">
+            <img src="ad3.jpg" alt="Ad 3">
+        </div>
+    </footer>
+</body>
+</html>

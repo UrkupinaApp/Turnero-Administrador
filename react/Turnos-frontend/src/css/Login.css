@@ -1,0 +1,31 @@
+/* Login.css */
+.login-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background:linear-gradient(rgba(116, 139, 237, 0.4),rgba(149, 90, 194, 0.4)), url('../assets/background.png');
+  }
+  
+  .login-form-container {
+    background: white;
+    padding: 34px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .login-logo {
+    display: block;
+    margin: 0 auto 24px;
+    width: 180px;
+    height: auto;
+  }
+
+  .Titulo{
+    text-align: center;
+    font-size: 32px;
+    font-weight: 600;
+  }
+  

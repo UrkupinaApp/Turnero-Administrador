@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="imagen-container">
+
+            <img src="./assets/logo_64.png" class="imagen-sidebar" />
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#dashboard">Dashboard</a></li>
+                <li><a href="#users">Usuarios</a></li>
+                <li><a href="#settings">Ajustes</a></li>
+                <li><a href="#logout">Logout</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="main-content">
+        <header>
+            <h1>Dashboard</h1>
+            <div class="user-info">
+                <span>Welcome, Admin</span>
+                <img src="./assets/icon.png" alt="User Avatar">
+            </div>
+        </header>
+        <section class="content">
+            <h2>Turnos Pendientes</h2>
+            <div id="turnos-pendientes" class="turnos-container"></div>
+
+            <h2>Turnos en Curso</h2>
+            <div id="turnos-en-curso" class="turnos-container"></div>
+        </section>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="./js/admin.js"></script>
+</body>
+</html>

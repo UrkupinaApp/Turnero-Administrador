@@ -1,0 +1,37 @@
+CREATE DATABASE ApiTurnos;
+
+USE ApiTurnos;
+
+-- Tabla Usuario
+CREATE TABLE Usuario (
+    ID_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    Nombre VARCHAR(255) NOT NULL,
+    Telefono VARCHAR(15),
+    Tipo_cliente ENUM('regular', 'preferencial') NOT NULL
+);
+
+-- Tabla Turno
+CREATE TABLE Turno (
+    ID_turno INT AUTO_INCREMENT PRIMARY KEY,
+    Numero_turno INT,
+    Hora_solicitud DATETIME DEFAULT CURRENT_TIMESTAMP,
+    Estado ENUM('pendiente', 'en_curso', 'completado') DEFAULT 'pendiente',
+    ID_usuario INT,
+    FOREIGN KEY (ID_usuario) REFERENCES Usuario(ID_usuario)
+);
+
+-- Tabla Caja
+CREATE TABLE Caja (
+    ID_caja INT AUTO_INCREMENT PRIMARY KEY,
+    Numero_caja INT,
+    Estado ENUM('disponible', 'ocupado') DEFAULT 'disponible'
+);
+
+-- Tabla Empleado
+CREATE TABLE Empleado (
+    ID_empleado INT AUTO_INCREMENT PRIMARY KEY,
+    Nombre VARCHAR(255) NOT NULL,
+    Cargo VARCHAR(100) NOT NULL,
+    ID_caja INT,
+    FOREIGN KEY (ID_caja) REFERENCES Caja(ID_caja)
+);

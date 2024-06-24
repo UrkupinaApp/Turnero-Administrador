@@ -1,0 +1,7 @@
+Usuario (ID_usuario, Nombre, Telefono, Tipo_cliente)
+
+Turno (ID_turno, Numero_turno, Hora_solicitud, Estado, ID_usuario)
+
+Caja (ID_caja, Numero_caja, Estado)
+
+Empleado (ID_empleado, Nombre, Cargo, ID_caja)
