@@ -23,7 +23,7 @@ AdminRouter.put('/api/recovery/:id',adminMiddlewear,updateAdmin)
 
 AdminRouter.delete('/delete/:id',verifyRole,DeleteAdmin)
 
-AdminRouter.post('/register',verifyRole,Register)
+AdminRouter.post('/register',Register)
 
 
 module.exports = AdminRouter;
