@@ -12,7 +12,7 @@ const adminMiddlewear = (req,res,next)=>{
             if(err){
                 res.status(401).json({message:"Token invalido.."})
             }
-            if(result.rol !== "admin"){
+            if(result.rol !== "admin" ){
                 res.status(403).json({message:"Ruta Restringida.."})
             }
         })
