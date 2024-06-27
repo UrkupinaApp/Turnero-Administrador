@@ -61,7 +61,8 @@ const userLogin = async (req, res) => {
 
             // Generar un token JWT con una expiración de 1 hora
             if(user.status === "activo"){
-            const token = jwt.sign({ userId: user.id,username:user.name,DNI:user.dni,Tel:user.celular,Pasillo:user.pasillo,Fila:user.fila,Puesto:user.puesto,Redes:user.redes_sociales }, process.env.JWT_SECRET, { expiresIn: '3h' });
+            const token = jwt.sign({ userId: user.id,username:user.name,DNI:user.dni,Tel:user.celular}, process.env.JWT_SECRET, { expiresIn: '3h' });
+            const dataUser= {}
             res.status(200).json({ token,"id":user.id,"creditos":user.creditos });
         }else{
             res.status(401).json({message:"su usuario esta inactivo"})

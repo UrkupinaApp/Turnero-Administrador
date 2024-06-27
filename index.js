@@ -1,4 +1,3 @@
-// index.js (Servidor Node.js)
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
@@ -6,7 +5,7 @@ const socketIo = require('socket.io');
 const http = require('http');
 const path = require('path');
 const mysql = require('mysql');
-const connectio = require('./db/db.connection')
+const connectio = require('./db/db.connection');
 
 dotenv.config();
 
@@ -15,15 +14,19 @@ const PORT = process.env.PORT || 3000;
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "*", // Permitir todas las conexiones de origen
-    methods: ["GET", "POST"]
+    origin: '*', // Permitir todas las conexiones de origen
+    methods: ['GET', 'POST']
   }
 });
 
 const distPath = path.join(__dirname, 'react', 'Turnos-frontend', 'dist');
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: '*', // Permitir todas las conexiones de origen
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Permitir estos métodos
+  allowedHeaders: ['Content-Type', 'Authorization'] // Permitir estos encabezados
+}));
 app.use(express.json());
 
 // Rutas API
