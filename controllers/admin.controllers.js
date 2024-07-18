@@ -84,6 +84,7 @@ const updateAdmin = (req, res) => {
 
 const Login = (req, res) => {
     const { username, password } = req.body;
+    console.log(username,password)
 
     // Verificar las credenciales del usuario en la base de datos
     const query = 'SELECT * FROM admins WHERE username = ?';

@@ -1,7 +1,13 @@
 import React from 'react';
+import AppLayout from './CustomLayout';
 
 const Dashboard = () => {
-  return <h1>Dashboard Page</h1>;
+  return(
+
+    <AppLayout>
+      <div>Dashboard</div>
+    </AppLayout>
+  )
 };
 
 export default Dashboard;

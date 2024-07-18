@@ -6,6 +6,8 @@ import Home from './components/Home';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import PublicRouter  from './Routes/PublicRouter';
+import  Creditos  from './Components/Creditos';
+import Clientes from './Components/Clientes';
 
 const App = () => {
   return (
@@ -20,6 +22,8 @@ const App = () => {
           <Route path='/private' element={<PrivateRouter />}>
             <Route path="/private/dashboard" element={<Dashboard />} />
             <Route path="/private/home" element={<Home />} />
+            <Route path = "/private/creditos" element={<Creditos/>}/>
+            <Route path='/private/clientes' element={<Clientes/>}/>
           </Route>
         </Routes>
       

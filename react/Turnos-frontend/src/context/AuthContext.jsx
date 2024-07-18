@@ -16,7 +16,7 @@ export function AuthProvider({ children }) {
     localStorage.setItem(AppUserData, JSON.stringify(values));
     console.log(values)
     setAuthenticated(true);
-    console.log("uth desde Auth",Authenticated)
+    console.log("uth desde Auth",Authenticated,values)
     setUser(values);
   }, []);
 

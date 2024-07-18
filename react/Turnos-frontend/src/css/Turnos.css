@@ -26,6 +26,17 @@
     margin-left: 15px;
 }
 
+
+.content {
+    padding: 20px;
+    background-color: "#ffff";
+  }
+  
+  h2 {
+    margin-bottom: 20px;
+  }
+
+  
 .turno-call{
     padding: 10px;
     color: black;

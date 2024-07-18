@@ -13,7 +13,7 @@ const adminMiddlewear = require('../middlewears/admin.middlewear')
 
 
 //rutas
-UserRoutes.get('/',adminMiddlewear,getAllUsers)
+UserRoutes.get('/',getAllUsers)
 UserRoutes.post('/login',userLogin)
 UserRoutes.post('/register',userRegister)
 UserRoutes.put('/update/:id',userUpdate)

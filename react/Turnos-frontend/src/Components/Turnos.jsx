@@ -1,32 +1,9 @@
-// Turnos.js
-import React, { useEffect, useState } from 'react';
-import io from 'socket.io-client';
-import '../css/Turnos.css'
+import React from 'react';
+import { Card, Button, Row, Col } from 'antd';
+import { ClockCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import '../css/Turnos.css';
 
-const socket = io('http://localhost:3005', {
-  transports: ['websocket'], // Usar websocket como el transporte
-  pingInterval: 25000,       // Intervalo de ping
-  pingTimeout: 20000,        // Timeout de ping
-  maxPayload: 1000000        // Tamaño máximo de payload
-});
-
-function Turnos() {
-  const [turnosDisponibles, setTurnosDisponibles] = useState([]);
-  const [turnosEnCurso, setTurnosEnCurso] = useState([]);
-
-  useEffect(() => {
-    socket.on('turnos', (data) => {
-        console.log("esta es la data de disponibles",data.disponibles)
-      setTurnosDisponibles(data.disponibles);
-      setTurnosEnCurso(data.enCurso);
-      console.log(turnosDisponibles)
-      console.log(turnosEnCurso)
-    });
-
-    return () => {
-      socket.off('turnos');
-    };
-  }, []);
+function Turnos({ turnosDisponibles, turnosEnCurso, socket }) {
 
   const llamarTurno = (id) => {
     socket.emit('llamarTurno', id);
@@ -36,27 +13,49 @@ function Turnos() {
     socket.emit('completarTurno', id);
   };
 
+  const renderTurnoCard = (turno, isEnCurso) => (
+    <Card
+      key={turno.id}
+      style={{ marginBottom: 16 }}
+      actions={[
+        <Button onClick={() => isEnCurso ? completarTurno(turno.id) : llamarTurno(turno.id)}>
+          {isEnCurso ? 'Completar' : 'Llamar'}
+        </Button>
+      ]}
+    >
+      <Card.Meta
+        avatar={isEnCurso ? <CheckCircleOutlined style={{ color: 'green' }} /> : <ClockCircleOutlined style={{ color: 'orange' }} />}
+        title={`Usuario: ${turno.user_name}`}
+        description={
+          <>
+            <p>Código: {turno.cod_reserva}</p>
+            <p>Estado: {turno.status}</p>
+            <p>Motivo: {turno.motivo}</p>
+          </>
+        }
+      />
+    </Card>
+  );
+
   return (
     <div className='content'>
-      <h2>Turnos Esperando ser llamados</h2>
-      <ul>
+      <h2>Turnos Esperando ser llamados2</h2>
+      <Row gutter={[16, 16]}>
         {turnosDisponibles.map((turno) => (
-          <li key={turno.id} className='turno-item'>
-            Usuario: {turno.user_name} Codigo: {turno.cod_reserva} Estado : {turno.status} Motivo : {turno.motivo}
-            <button onClick={() => llamarTurno(turno.id)} className='turno-call'>Llamar</button>
-          </li>
+          <Col span={8} key={turno.id}>
+            {renderTurnoCard(turno, false)}
+          </Col>
         ))}
-      </ul>
+      </Row>
 
       <h2>Turnos en Curso</h2>
-      <ul>
+      <Row gutter={[16, 16]}>
         {turnosEnCurso.map((turno) => (
-          <li key={turno.id} className='turno-item'>
-            Usuario: {turno.user_name}  Codigo: {turno.cod_reserva}  Estado: {turno.status}  Motivo:{turno.motivo}
-            <button onClick={() => completarTurno(turno.id)} className='button-completar'>Completar</button>
-          </li>
+          <Col span={8} key={turno.id}>
+            {renderTurnoCard(turno, true)}
+          </Col>
         ))}
-      </ul>
+      </Row>
     </div>
   );
 }
