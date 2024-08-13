@@ -78,7 +78,7 @@ io.on('connection', (socket) => {
   sendTurnos();
 
   // Manejar llamada de turno
-  socket.on('llamarTurno', (turnoId) => {
+    socket.on('llamarTurno', (turnoId) => {
     db.query('UPDATE turnos SET status = "en_curso" WHERE id = ?', [turnoId], (err, result) => {
       if (err) {
         console.error('Error updating turno:', err);
