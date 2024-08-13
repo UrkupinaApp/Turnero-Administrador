@@ -10,7 +10,7 @@ creditosRouter.get('/',(req,res)=>{
     res.send('creditos...')
 })
 
-creditosRouter.post("/carga/:id",adminMiddlewear,carga_credito)
+creditosRouter.post("/carga/:id",carga_credito)
 
 creditosRouter.put("/update/:id",descarga_credito)
 

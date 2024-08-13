@@ -70,20 +70,20 @@ const EditableCell = ({
 const UserTable = () => {
   const [dataSource, setDataSource] = useState([]);
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetch('http://localhost:3005/api/users/')
+    fetch('https://xn--urkupia-9za.online/users/')
       .then(response => response.json())
       .then(data => {
         setDataSource(data);
+        console.log(data)
       })
       .catch(error => {
         console.error('There was an error fetching the data!', error);
       });
   }, []);
 
-  const handleSave = async (row) => {
+ /*  const handleSave = async (row) => {
     const newData = [...dataSource];
     const index = newData.findIndex((item) => row.id === item.id);
     const item = newData[index];
@@ -96,7 +96,7 @@ const UserTable = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ creditos: row.creditos }),
+        body: JSON.stringify({ creditos: row.creditosACargar }),
       });
 
       if (!response.ok) {
@@ -106,11 +106,56 @@ const UserTable = () => {
       const data = await response.json();
       console.log('Updated successfully', data);
 
-      // Update the local state with the new credits
+      // Actualizar los créditos en el estado local
       newData[index].creditos = data.creditos;
       setDataSource([...newData]);
     } catch (error) {
       console.error('There was an error updating the data!', error);
+    }
+  };
+ */
+
+  const handleSave = async (row) => {
+    try {
+        const response = await fetch(`http://localhost:3005/api/creditos/carga/${row.id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ creditos: row.creditosACargar }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        console.log('Updated successfully', data);
+
+        // Actualizar el estado con los datos del usuario actualizado
+        const newData = dataSource.map(item => (item.id === data.user.id ? data.user : item));
+        setDataSource(newData);
+
+    } catch (error) {
+        console.error('There was an error updating the data!', error);
+    }
+};
+
+
+
+  const handleSuspend = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:3005/api/users/suspend/${id}`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      console.log('User suspended successfully');
+    } catch (error) {
+      console.error('There was an error suspending the user!', error);
     }
   };
 
@@ -124,37 +169,36 @@ const UserTable = () => {
       title: 'Creditos',
       dataIndex: 'creditos',
       key: 'creditos',
-      editable: true,
     },
     {
-      title: 'Acción',
-      dataIndex: 'action',
+      title: 'Cargar Créditos y Acción',
+      key: 'action',
       render: (_, record) => (
         <span>
+          <Input
+            value={record.creditosACargar}
+            onChange={(e) => {
+              const newData = [...dataSource];
+              const index = newData.findIndex((item) => record.id === item.id);
+              newData[index].creditosACargar = e.target.value;
+              setDataSource(newData);
+            }}
+            style={{ width: '100px', marginRight: '8px' }}
+          />
           <Button
             onClick={() => handleSave(record)}
             type="primary"
-            style={{ marginRight: 8 }}
+            style={{ marginRight: '8px' }}
           >
             Cargar
           </Button>
+          <Button
+            onClick={() => handleSuspend(record.id)}
+            type="danger"
+          >
+            Suspender
+          </Button>
         </span>
-      ),
-    },
-    {
-      title: 'Cantidad a Cargar',
-      dataIndex: 'creditosACargar',
-      key: 'creditosACargar',
-      render: (_, record) => (
-        <Input
-          value={record.creditosACargar}
-          onChange={(e) => {
-            const newData = [...dataSource];
-            const index = newData.findIndex((item) => record.id === item.id);
-            newData[index].creditosACargar = e.target.value;
-            setDataSource(newData);
-          }}
-        />
       ),
     },
   ];

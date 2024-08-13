@@ -23,7 +23,7 @@ const AppLayout = ({children}) => {
     {
       key:0,
       icon: <HomeOutlined />,
-      label:"Home",
+      label:"Turnos",
       onClick : ()=>navigate("/private/home")
     },
     {

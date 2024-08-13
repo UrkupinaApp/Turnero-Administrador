@@ -8,6 +8,8 @@ import Dashboard from './components/Dashboard';
 import PublicRouter  from './Routes/PublicRouter';
 import  Creditos  from './Components/Creditos';
 import Clientes from './Components/Clientes';
+import Pantalla from './Components/Pantalla';
+import PantallaAtencion from './Components/Pantalla';
 
 const App = () => {
   return (
@@ -16,7 +18,7 @@ const App = () => {
         <Routes>
           
           <Route path='/' element={<PublicRouter/>}>
-          <Route  index path='/login' element={<Login/>}/>
+          <Route  index path='/' element={<Login/>}/>
 
           </Route>
           <Route path='/private' element={<PrivateRouter />}>
@@ -24,6 +26,7 @@ const App = () => {
             <Route path="/private/home" element={<Home />} />
             <Route path = "/private/creditos" element={<Creditos/>}/>
             <Route path='/private/clientes' element={<Clientes/>}/>
+            <Route path='/private/pantalla' element={<PantallaAtencion/>}/>
           </Route>
         </Routes>
       

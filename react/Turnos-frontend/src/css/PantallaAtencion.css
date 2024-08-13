@@ -1,0 +1,84 @@
+/* PantallaAtencion.css */
+
+.h-screen {
+    height: 100vh;
+  }
+  
+  .sider-bar {
+    background-color: #f0f2f5;
+    padding: 20px;
+  }
+  
+  .sider-bar-right {
+    background-color: #f0f2f5;
+    padding: 20px;
+  }
+  
+  .sider-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 16px;
+  }
+  
+  .main-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-color: #ffffff;
+  }
+  
+  .video-container {
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+  }
+  
+  .video-element {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+  
+  .image-sections {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  
+  .image-section {
+    flex: 1;
+    background-color: #e8e8e8;
+    border-radius: 8px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .image-section:not(:last-child) {
+    margin-right: 10px;
+  }
+  
+  /* Modal */
+  .ant-modal {
+    text-align: center;
+  }
+  
+  .ant-modal-title {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .ant-modal-body {
+    padding: 20px;
+  }
+  
+  .ant-modal p {
+    font-size: 18px;
+    margin: 10px 0;
+  }
+  

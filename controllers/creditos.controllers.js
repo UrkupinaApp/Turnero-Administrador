@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const connection = require('../db/db.connection');
 
-const carga_credito = (req, res) => {
+/* const carga_credito = (req, res) => {
     try {
         // Obtener el userId de los parámetros de la solicitud
         const { id } = req.params;
@@ -51,7 +51,61 @@ const carga_credito = (req, res) => {
     }
 };
 
+ */
+const carga_credito = (req, res) => {
+    try {
+        const { id } = req.params;
+        const { creditos } = req.body;
 
+        if (!creditos) {
+            return res.status(400).json({ message: "El campo creditos es requerido" });
+        }
+
+        const userQuery = 'SELECT * FROM users WHERE id = ?';
+        connection.query(userQuery, [id], (userError, userResults) => {
+            if (userError) {
+                console.error("Error al verificar el usuario:", userError);
+                return res.status(500).json({ message: "Error al verificar el usuario" });
+            }
+
+            if (userResults.length === 0) {
+                return res.status(404).json({ message: "Usuario no encontrado" });
+            }
+
+            const creditosQuery = 'INSERT INTO creditos (creditos, user_id) VALUES (?, ?)';
+            connection.query(creditosQuery, [creditos, id], (creditosError, creditosResults) => {
+                if (creditosError) {
+                    console.error("Error al cargar el crédito:", creditosError);
+                    return res.status(500).json({ message: "Error al cargar el crédito" });
+                }
+
+                const updateQuery = 'UPDATE users SET creditos = creditos + ? WHERE id = ?';
+                connection.query(updateQuery, [creditos, id], (updateError, updateResults) => {
+                    if (updateError) {
+                        console.error("Error al actualizar los créditos del usuario:", updateError);
+                        return res.status(500).json({ message: "Error al actualizar los créditos del usuario" });
+                    }
+
+                    // Obtener los datos actualizados del usuario
+                    connection.query(userQuery, [id], (userError, updatedUserResults) => {
+                        if (userError) {
+                            console.error("Error al obtener los datos actualizados del usuario:", userError);
+                            return res.status(500).json({ message: "Error al obtener los datos actualizados del usuario" });
+                        }
+
+                        res.status(201).json({ 
+                            message: "Crédito cargado exitosamente", 
+                            user: updatedUserResults[0]  // Devolver los datos actualizados del usuario
+                        });
+                    });
+                });
+            });
+        });
+    } catch (error) {
+        console.error("Error al cargar el crédito:", error);
+        res.status(500).json({ message: "Error al cargar el crédito" });
+    }
+};
 
 
 const descarga_credito = (req, res) => {
