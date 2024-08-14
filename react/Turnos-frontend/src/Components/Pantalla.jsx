@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Modal, Card, Table, Tag, Layout } from 'antd';
 import io from 'socket.io-client';
 import '../css/PantallaAtencion.css';
-
+import video from '../assets/Video.mp4'
 const { Sider, Content } = Layout;
 const socket = io('https://xn--urkupia-9za.online'); // Ajusta la URL si es necesario
 
@@ -62,7 +62,9 @@ const PantallaAtencion = () => {
         <Content className="main-content">
           <div className="video-container">
             <video
-              src="https://www.youtube.com/watch?v=9OczYz0ZO2A"
+              src={video}
+              autoPlay={true}
+              muted
               controls
               className="video-element"
             />
@@ -90,7 +92,7 @@ const PantallaAtencion = () => {
           />
         </Sider>
       </Layout>
-      <Modal
+{/*       <Modal
         title="Turno Llamado"
         visible={!!turnoLlamado}
         footer={null}
@@ -105,7 +107,31 @@ const PantallaAtencion = () => {
             <p><strong>Estado:</strong> {turnoLlamado.status}</p>
           </>
         )}
-      </Modal>
+      </Modal> */}
+
+
+<Modal
+  title={<span style={{ fontSize: '24px', color: '#333' }}>Turno Llamado</span>}
+  visible={!!turnoLlamado}
+  footer={null}
+  centered
+  onCancel={() => setTurnoLlamado(null)}
+  style={{
+    backgroundColor: '#f5f5f5',
+    borderRadius: '10px',
+    padding: '20px',
+  }}
+>
+  {turnoLlamado && (
+    <>
+      <p style={{ fontSize: '18px', color: '#555', marginBottom: '10px' }}><strong>Código de Reserva:</strong> {turnoLlamado.cod_reserva}</p>
+      <p style={{ fontSize: '18px', color: '#555', marginBottom: '10px' }}><strong>Usuario:</strong> {turnoLlamado.user_name}</p>
+      <p style={{ fontSize: '18px', color: '#555', marginBottom: '10px' }}><strong>Motivo:</strong> {turnoLlamado.motivo}</p>
+      <p style={{ fontSize: '18px', color: '#555', marginBottom: '10px' }}><strong>Estado:</strong> {turnoLlamado.status}</p>
+    </>
+  )}
+</Modal>
+
     </Layout>
   );
 };

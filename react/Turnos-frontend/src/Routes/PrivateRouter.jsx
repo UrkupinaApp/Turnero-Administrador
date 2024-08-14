@@ -9,7 +9,7 @@ const PrivateRouter = () => {
     
 
     if(!Authenticated){
-        return <Navigate to={"/login"}/>
+        return <Navigate to={"/"}/>
     }
             return(<div><Outlet/></div>)
     

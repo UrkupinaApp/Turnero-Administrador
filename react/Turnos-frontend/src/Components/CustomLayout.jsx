@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout, Menu } from 'antd';
+import { Layout, Menu, Button } from 'antd';
 import { useNavigate, Outlet } from 'react-router-dom';
 import {
   DashboardOutlined,
@@ -8,42 +8,41 @@ import {
   UserOutlined
 } from '@ant-design/icons';
 import FotoPerfin from '../assets/avatar.jpg';
+import { useAuthContext } from '../context/AuthContext'; // Importa el contexto
 import '../css/Layout.css';
 
 const { Sider, Content, Header } = Layout;
 
-const AppLayout = ({children}) => {
-  // Obtener datos del usuario desde localStorage
+const AppLayout = ({ children }) => {
+  const { Logout } = useAuthContext(); // Obtén la función Logout del contexto
   const userData = JSON.parse(localStorage.getItem('AppUserData'));
   const navigate = useNavigate();
 
-  // Definir los elementos del menú
   const menuItems = [
-
     {
-      key:0,
+      key: 0,
       icon: <HomeOutlined />,
-      label:"Turnos",
-      onClick : ()=>navigate("/private/home")
+      label: 'Turnos',
+      onClick: () => navigate('/private/home'),
     },
     {
       key: '1',
-      icon: <DashboardOutlined style={{size:"60px"}} />,
+      icon: <DashboardOutlined style={{ size: '60px' }} />,
       label: 'Dashboard',
-      onClick: () => navigate("/private/dashboard")
+      onClick: () => navigate('/private/dashboard'),
     },
     {
       key: '2',
       icon: <DollarCircleOutlined />,
       label: 'Créditos',
-      onClick: () => navigate("/private/creditos")
+      onClick: () => navigate('/private/creditos'),
     },
     {
       key: '3',
       icon: <UserOutlined />,
       label: 'Clientes',
-      onClick: () => navigate("/private/clientes")
-    }
+      onClick: () => navigate('/private/clientes'),
+    },
   ];
 
   return (
@@ -57,6 +56,9 @@ const AppLayout = ({children}) => {
             <h3>Administrador: {userData.username}</h3>
             <p>Caja: {userData.caja}</p>
           </div>
+          <Button type="primary" onClick={Logout} style={{ marginLeft: 'auto' }}>
+            Logout
+          </Button>
         </div>
       </Header>
       <Layout>
@@ -71,9 +73,8 @@ const AppLayout = ({children}) => {
         </Sider>
         <Layout>
           <Content style={{ margin: '16px' }}>
-            <div style={{ padding: 24, minHeight: "100%" }}>
+            <div style={{ padding: 24, minHeight: '100%' }}>
               <Outlet />
-
               {children}
             </div>
           </Content>

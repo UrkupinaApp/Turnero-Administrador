@@ -72,7 +72,7 @@ const UserTable = () => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    fetch('https://xn--urkupia-9za.online/users/')
+    fetch('https://xn--urkupia-9za.online/api/users/')
       .then(response => response.json())
       .then(data => {
         setDataSource(data);
@@ -117,7 +117,7 @@ const UserTable = () => {
 
   const handleSave = async (row) => {
     try {
-        const response = await fetch(`http://localhost:3005/api/creditos/carga/${row.id}`, {
+        const response = await fetch(`https://xn--urkupia-9za.online/api/creditos/carga/${row.id}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
