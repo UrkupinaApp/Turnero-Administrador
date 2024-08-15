@@ -8,7 +8,6 @@ import Dashboard from './components/Dashboard';
 import PublicRouter  from './Routes/PublicRouter';
 import  Creditos  from './Components/Creditos';
 import Clientes from './Components/Clientes';
-import Pantalla from './Components/Pantalla';
 import PantallaAtencion from './Components/Pantalla';
 
 const App = () => {
