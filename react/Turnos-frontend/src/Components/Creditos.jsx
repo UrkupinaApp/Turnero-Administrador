@@ -1,13 +1,14 @@
 import React from 'react'
 import AppLayout from './CustomLayout';
 import UserTable from './UserTable';
+import UsersTableEdit from './UserTableEdit';
 
 const Creditos = () => {
   return (
 
     <AppLayout>
 
-        <div>Creditos</div>
+        <h1>Carga de Creditos</h1>
         <UserTable/>
 
     </AppLayout>

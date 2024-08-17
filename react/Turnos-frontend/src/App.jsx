@@ -18,6 +18,7 @@ const App = () => {
           
           <Route path='/' element={<PublicRouter/>}>
           <Route  index path='/' element={<Login/>}/>
+          <Route path='/pantalla' element={<PantallaAtencion/>}/>
 
           </Route>
           <Route path='/private' element={<PrivateRouter />}>
@@ -25,7 +26,6 @@ const App = () => {
             <Route path="/private/home" element={<Home />} />
             <Route path = "/private/creditos" element={<Creditos/>}/>
             <Route path='/private/clientes' element={<Clientes/>}/>
-            <Route path='/private/pantalla' element={<PantallaAtencion/>}/>
           </Route>
         </Routes>
       

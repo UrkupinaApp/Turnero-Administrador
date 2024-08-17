@@ -10,13 +10,22 @@ function Turnos({ socket }) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    // Escuchar el evento de turnos desde el socket
-    socket.on('turnos', (turnos) => {
-      const disponibles = turnos.filter(turno => turno.status === 'pendiente');
+    // Función para actualizar los turnos
+    const updateTurnos = (turnos) => {
+      const today = new Date().toISOString().split('T')[0]; // Obtener la fecha actual en formato YYYY-MM-DD
+      const disponibles = turnos.filter(
+        (turno) => {
+          const turnoFecha = new Date(turno.fecha).toISOString().split('T')[0];
+          return turno.status === 'pendiente' && turnoFecha === today;
+        }
+      );
       const enCurso = turnos.filter(turno => turno.status === 'en_curso');
       setTurnosDisponibles(disponibles);
       setTurnosEnCurso(enCurso);
-    });
+    };
+
+    // Escuchar el evento de turnos desde el socket
+    socket.on('turnos', updateTurnos);
 
     // Escuchar el evento de turno llamado desde el socket
     socket.on('turnoLlamado', (turno) => {
@@ -33,10 +42,19 @@ function Turnos({ socket }) {
       }, 4000);
     });
 
-    // Limpieza del socket en el desmontaje del componente
+    // Emitir un evento para solicitar los turnos actualizados cada 3 segundos
+    const intervalId = setInterval(() => {
+      socket.emit('requestTurnos'); // Emitir un evento para solicitar los turnos actualizados
+    }, 3000); // 3000 ms = 3 segundos
+
+    // Emitir el evento inicialmente para obtener los datos cuando se carga el componente
+    socket.emit('requestTurnos');
+
+    // Limpieza del socket y el intervalo en el desmontaje del componente
     return () => {
       socket.off('turnos');
       socket.off('turnoLlamado');
+      clearInterval(intervalId);
     };
   }, [socket]);
 
@@ -76,7 +94,7 @@ function Turnos({ socket }) {
 
   return (
     <div className='content'>
-      <h2>Turnos Esperando ser llamados</h2>
+      <h2>Turnos Pendientes para Hoy</h2>
       <Row gutter={[16, 16]}>
         {turnosDisponibles.length > 0 ? (
           turnosDisponibles.map((turno) => (
@@ -85,7 +103,7 @@ function Turnos({ socket }) {
             </Col>
           ))
         ) : (
-          <Col span={24}><p>No hay turnos disponibles</p></Col>
+          <Col span={24}><p>No hay turnos pendientes para hoy</p></Col>
         )}
       </Row>
 
