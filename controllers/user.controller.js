@@ -131,11 +131,11 @@ const userRegister = async (req, res) => {
             const hashedPass = await bcrypt.hash(password, 10);
             const redesSocialesJSON = JSON.stringify(redes_sociales); // Convertir el objeto de redes sociales a JSON string
             
-            connection.query('INSERT INTO users (name, password,creditos, celular, dni, fila, pasillo, puesto, redes_sociales) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', 
-                [name, hashedPass,20, celular, dni, fila, pasillo, puesto, redesSocialesJSON], 
+            connection.query('INSERT INTO users (name, password, creditos, celular, dni, fila, pasillo, puesto, redes_sociales) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+                [name, hashedPass, 20, celular, dni, fila, pasillo, puesto, redesSocialesJSON], 
                 (err, results) => {
                     if (err) {
-                        console.log(err)
+                        console.log(err);
                         return res.status(500).json({ message: "Error al insertar usuario" });
                     }
                     res.status(201).json({ message: "Nuevo usuario registrado" });
