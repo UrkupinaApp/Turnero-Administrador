@@ -5,7 +5,6 @@ import '../css/PantallaAtencion.css';
 import video from '../assets/Video.mp4';
 
 const { Sider, Content } = Layout;
-const socket = io('https://xn--urkupia-9za.online'); // Ajusta la URL si es necesario
 
 const PantallaAtencion = () => {
   const [turnos, setTurnos] = useState([]);
@@ -13,6 +12,8 @@ const PantallaAtencion = () => {
   const [turnoEnCurso, setTurnoEnCurso] = useState([]);
 
   useEffect(() => {
+    const socket = io('https://xn--urkupia-9za.online'); // Ajusta la URL si es necesario
+
     // Función para actualizar los turnos
     const updateTurnos = (data) => {
       const today = new Date().toISOString().split('T')[0]; // Obtener la fecha actual en formato YYYY-MM-DD
@@ -51,6 +52,7 @@ const PantallaAtencion = () => {
       socket.off('turnos');
       socket.off('turnoLlamado');
       clearInterval(intervalId);
+      socket.disconnect(); // Cerrar la conexión del socket
     };
   }, []);
 

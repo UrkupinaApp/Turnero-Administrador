@@ -8,7 +8,10 @@ const RegisterUserForm = () => {
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      const response = await axios.post('https://xn--urkupia-9za.online/api/users/register', values);
+      // Añadimos el valor de créditos manualmente
+      const data = { ...values, creditos: 20 };
+
+      const response = await axios.post('https://xn--urkupia-9za.online/api/users/register', data);
       message.success(response.data.message);
     } catch (error) {
       message.error(error.response?.data?.message || 'Error al registrar usuario');
