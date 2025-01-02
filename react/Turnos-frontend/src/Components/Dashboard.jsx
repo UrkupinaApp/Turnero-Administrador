@@ -5,7 +5,7 @@ const Dashboard = () => {
   return(
 
     <AppLayout>
-      <div>Dashboard</div>
+      <div>Dashboard Urkupina</div>
     </AppLayout>
   )
 };
