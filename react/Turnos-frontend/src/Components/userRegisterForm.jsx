@@ -13,8 +13,12 @@ const RegisterUserForm = () => {
 
       const response = await axios.post('https://xn--urkupia-9za.online/api/users/register', data);
       message.success(response.data.message);
+      const datos = response.jsson().message
+      console.log(datos)
+      
     } catch (error) {
       message.error(error.response?.data?.message || 'Error al registrar usuario');
+      console.log(error)
     } finally {
       setLoading(false);
     }

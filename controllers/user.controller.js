@@ -112,7 +112,7 @@ const userRegister = async (req, res) => {
         const { name, password, celular, dni,email, fila, pasillo, puesto } = req.body;
         
         // Verificar si todos los campos requeridos están presentes
-        if (!name || !password || !celular || !dni || !fila || !pasillo || !puesto || !redes_sociales) {
+        if (!name || !password || !celular || !dni ||!email|| !fila || !pasillo || !puesto ) {
             return res.status(400).json({ message: "Todos los campos son requeridos" });
         }
 
