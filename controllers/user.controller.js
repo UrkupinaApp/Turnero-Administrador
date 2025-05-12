@@ -108,6 +108,7 @@ const userRegister = async (req, res) => {
 }; */
 
 const userRegister = async (req, res) => {
+    console.log("registrando")
     try {
         const { name, password, celular, dni, email, fila, pasillo, puesto } = req.body;
         
