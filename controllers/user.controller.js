@@ -109,10 +109,11 @@ const userRegister = async (req, res) => {
 
 const userRegister = async (req, res) => {
     try {
-        const { name, password, celular, dni,email, fila, pasillo, puesto } = req.body;
+        const { name, password, celular, dni, email, fila, pasillo, puesto } = req.body;
         
         // Verificar si todos los campos requeridos están presentes
-        if (!name || !password || !celular || !dni ||!email|| !fila || !pasillo || !puesto ) {
+        if (!name || !password || !celular || !dni ||!email || !fila || !pasillo || !puesto ) {
+            console.log(name,password,celular,dni,email,fila,pasillo,puesto)
             return res.status(400).json({ message: "Todos los campos son requeridos" });
         }
 
