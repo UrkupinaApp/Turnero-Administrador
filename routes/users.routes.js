@@ -23,7 +23,7 @@ UserRoutes.post('/recovery',userRecovery)
 UserRoutes.delete('/delete/:id',adminMiddlewear,userDelete)
 
 //esta ruta permite cambiar el estado del usuario de activo a inactivo y viceversa...
-UserRoutes.post('/suspender/:id',adminMiddlewear,userBanned)
+UserRoutes.post('/suspender/:id',userBanned)
 
 
 

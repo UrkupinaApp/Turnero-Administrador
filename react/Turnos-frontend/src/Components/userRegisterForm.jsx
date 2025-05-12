@@ -47,6 +47,7 @@ const RegisterUserForm = () => {
           </Form.Item>
         </Col>
       </Row>
+
       <Row gutter={16}>
         <Col span={12}>
           <Form.Item
@@ -67,6 +68,22 @@ const RegisterUserForm = () => {
           </Form.Item>
         </Col>
       </Row>
+
+      <Row gutter={16}>
+        <Col span={24}>
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[
+              { required: true, message: 'Por favor ingrese su email' },
+              { type: 'email', message: 'Ingrese un email válido' },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+        </Col>
+      </Row>
+
       <Row gutter={16}>
         <Col span={8}>
           <Form.Item
@@ -96,13 +113,7 @@ const RegisterUserForm = () => {
           </Form.Item>
         </Col>
       </Row>
-      <Form.Item
-        label="Redes Sociales"
-        name="redes_sociales"
-        rules={[{ required: true, message: 'Por favor ingrese las redes sociales' }]}
-      >
-        <Input.TextArea />
-      </Form.Item>
+
       <Form.Item>
         <Button type="primary" htmlType="submit" loading={loading}>
           Registrar

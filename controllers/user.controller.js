@@ -109,7 +109,7 @@ const userRegister = async (req, res) => {
 
 const userRegister = async (req, res) => {
     try {
-        const { name, password, celular, dni, fila, pasillo, puesto, redes_sociales } = req.body;
+        const { name, password, celular, dni,email, fila, pasillo, puesto } = req.body;
         
         // Verificar si todos los campos requeridos están presentes
         if (!name || !password || !celular || !dni || !fila || !pasillo || !puesto || !redes_sociales) {
@@ -131,7 +131,7 @@ const userRegister = async (req, res) => {
             const hashedPass = await bcrypt.hash(password, 10);
             const redesSocialesJSON = JSON.stringify(redes_sociales); // Convertir el objeto de redes sociales a JSON string
             
-            connection.query('INSERT INTO users (name, password, creditos, celular, dni, fila, pasillo, puesto, redes_sociales) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+            connection.query('INSERT INTO users (name, password, creditos, celular, dni, email, fila, pasillo, puesto) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', 
                 [name, hashedPass, 20, celular, dni, fila, pasillo, puesto, redesSocialesJSON], 
                 (err, results) => {
                     if (err) {
@@ -306,6 +306,8 @@ const userBanned = (req,res)=>{
         res.status(500).json({ message: "Error al actualizar el estado del usuario" });
     }
 }
+
+
 
 
 module.exports = {getAllUsers,

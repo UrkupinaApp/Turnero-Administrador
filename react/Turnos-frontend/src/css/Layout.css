@@ -1,65 +1,117 @@
+:root {
+  --bg-color: #f5f5f5;
+  --header-bg: #ffffff;
+  --sidebar-bg: #001529;
+  --text-color: #222;
+  --success-color: #0bf32e;
+  --accent-color: #1890ff;
+  --card-bg: #ffffff;
+  --border-color: #e0e0e0;
+}
+
+/* ===================== HEADER ===================== */
 .header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   padding: 0 20px;
+  background-color: var(--header-bg) !important;
+  color: var(--text-color);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
 }
 
-.logout-button {
-  margin-left: -110px;
+/* ===================== USER INFO ===================== */
+.user-info {
+  display: flex;
+  width: 800px;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  gap: 12px;
+  margin-right: 4px;
+  
 }
 
-  .user-info {
-    display: flex;
-    align-items: center;
-    margin-right: 24px; /* Espacio entre el usuario y el borde derecho */
-  }
-  
-  .avatar-container {
-    width: 60px;
-    height: 60px;
-    overflow: hidden;
-    border-radius: 50%; /* Para hacer la imagen redondeada */
-    margin-left: 26px; /* Espacio entre la imagen y los detalles del usuario */
-  }
-  
-  .avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 30%;
-  }
+.avatar-container {
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  border-radius: 50%;
+  border: 2px solid var(--accent-color);
+}
 
-  .user-details{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .user-details h3 {
-    margin-bottom: 0;
-    font-size: 16px;
-    margin-left: 12px;
-    color: #ffffff;
-  }
-  
-  .user-details p {
-    margin-bottom: 0;
-    font-size: 16px;
-    color: #0bf32e;
-    margin-left: 12px;
-  }
-  
-  
-.home{
-  background: url(../assets/background2.png);
+.avatar {
   width: 100%;
   height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
-.sider-menu{
+.user-details {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin: 10px;
+}
+
+.user-details h3 {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+.user-details p {
+  margin: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--success-color);
+}
+
+/* ===================== LOGOUT BUTTON ===================== */
+.logout-button {
+  background-color: tomato;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #e84332;
+}
+
+/* ===================== SIDEBAR ===================== */
+.sider-menu {
   display: flex;
   flex-direction: column;
   padding: 20px;
   padding-top: 20px;
+  background-color: var(--sidebar-bg);
+}
 
+/* ===================== CONTENT AREA ===================== */
+.ant-layout-content {
+  background-color: var(--bg-color) !important;
+}
+
+/* ===================== CARD ===================== */
+.content-card {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px !important;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* ===================== BACKGROUND HOME (opcional) ===================== */
+.home {
+  background: url(../assets/background2.png);
+  width: 100%;
+  height: 100%;
 }
