@@ -271,43 +271,41 @@ const userDelete = (req,res)=>{
     }
 }
 
-const userBanned = (req,res)=>{
+const userBanned = (req, res) => {
     try {
-        // Obtener el ID del usuario y el nuevo estado desde los parámetros de la solicitud
-        const userId = req.params.id;
-        const { status } = req.body;
-
-        // Verificar que se haya proporcionado un nuevo estado
-        if (!status) {
-            return res.status(400).json({ message: "Se requiere el nuevo estado del usuario" });
+      const userId = req.params.id;
+      const { status } = req.body;
+  
+      if (!status) {
+        return res.status(400).json({ message: "Se requiere el nuevo estado del usuario" });
+      }
+  
+      if (status !== 'activo' && status !== 'inactivo') {
+        return res.status(400).json({ message: "El nuevo estado del usuario debe ser 'activo' o 'inactivo'" });
+      }
+  
+      connection.query(
+        'UPDATE users SET status = ?, creditos = ? WHERE id = ?',
+        [status, 0, userId],
+        (error, results) => {
+          if (error) {
+            console.error("Error al actualizar el estado del usuario:", error);
+            return res.status(500).json({ message: "Error al actualizar el estado del usuario" });
+          }
+  
+          if (results.affectedRows === 0) {
+            return res.status(404).json({ message: "El usuario no existe" });
+          }
+  
+          res.status(200).json({ message: "Estado del usuario y créditos actualizados con éxito" });
         }
-
-        // Verificar que el nuevo estado sea válido ('active' o 'inactive')
-        if (status !== 'activo' && status !== 'inactivo') {
-            return res.status(400).json({ message: "El nuevo estado del usuario debe ser 'active' o 'inactive'" });
-        }
-
-        // Actualizar el estado del usuario en la base de datos
-        connection.query(
-            'UPDATE users SET status = ? WHERE id = ?',
-            [status, userId],
-            (error, results) => {
-                if (error) {
-                    console.error("Error al actualizar el estado del usuario:", error);
-                    return res.status(500).json({ message: "Error al actualizar el estado del usuario" });
-                }
-                // Verificar si se actualizó algún registro
-                if (results.affectedRows === 0) {
-                    return res.status(404).json({ message: "El usuario no existe" });
-                }
-                res.status(200).json({ message: "Estado del usuario actualizado con éxito" });
-            }
-        );
+      );
     } catch (error) {
-        console.error("Error al actualizar el estado del usuario:", error);
-        res.status(500).json({ message: "Error al actualizar el estado del usuario" });
+      console.error("Error general al actualizar el usuario:", error);
+      res.status(500).json({ message: "Error al actualizar el estado del usuario" });
     }
-}
+  };
+  
 
 
 
