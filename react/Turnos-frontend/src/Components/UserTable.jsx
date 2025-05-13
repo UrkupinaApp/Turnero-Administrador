@@ -38,13 +38,12 @@ const EditableCell = ({
   };
 
   let childNode = children;
-
   if (editable) {
     childNode = editing ? (
       <Form.Item
         style={{ margin: 0 }}
         name={dataIndex}
-        rules={[{ required: true, message: `${title} is required.` }]}
+        rules={[{ required: true, message: `${title} es requerido.` }]}
       >
         <Input ref={inputRef} onPressEnter={save} onBlur={save} />
       </Form.Item>
@@ -69,14 +68,14 @@ const UserTable = () => {
   const searchInput = useRef(null);
   const [form] = Form.useForm();
 
-  // Función para obtener usuarios
+  // Carga inicial de datos
   const fetchData = async () => {
     try {
-      const response = await fetch('https://xn--urkupia-9za.online/api/users/');
-      const data = await response.json();
+      const res = await fetch('https://xn--urkupia-9za.online/api/users/');
+      const data = await res.json();
       setDataSource(data);
-    } catch (error) {
-      console.error('Error al obtener usuarios:', error);
+    } catch (err) {
+      console.error('Error al obtener usuarios:', err);
     }
   };
 
@@ -84,17 +83,16 @@ const UserTable = () => {
     fetchData();
   }, []);
 
+  // Buscador por columna
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchText(selectedKeys[0]);
     setSearchedColumn(dataIndex);
   };
-
   const handleReset = clearFilters => {
     clearFilters();
     setSearchText('');
   };
-
   const getColumnSearchProps = dataIndex => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
       <div style={{ padding: 8 }}>
@@ -122,7 +120,7 @@ const UserTable = () => {
         </Space>
       </div>
     ),
-    filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,    
+    filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
     onFilter: (value, record) =>
       record[dataIndex]
         ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
@@ -146,7 +144,7 @@ const UserTable = () => {
   // Actualiza créditos
   const handleSave = async row => {
     try {
-      const response = await fetch(
+      const res = await fetch(
         `https://xn--urkupia-9za.online/api/creditos/carga/${row.id}`,
         {
           method: 'POST',
@@ -154,21 +152,21 @@ const UserTable = () => {
           body: JSON.stringify({ creditos: row.creditosACargar }),
         }
       );
-      if (!response.ok) throw new Error('Network response was not ok');
-      const data = await response.json();
+      if (!res.ok) throw new Error('Error en la petición');
+      await res.json();
       fetchData();
-    } catch (error) {
-      console.error('Error al actualizar créditos:', error);
+    } catch (err) {
+      console.error('Error al actualizar créditos:', err);
     }
   };
 
-  // Cambia estado de usuario y recarga
+  // Suspender / habilitar usuario
   const updateUserStatus = async (id, newStatus) => {
     try {
       const token = localStorage.getItem('userToken');
       if (!token) throw new Error('No se encontró token');
 
-      const response = await fetch(
+      const res = await fetch(
         `https://xn--urkupia-9za.online/api/users/suspender/${id}`,
         {
           method: 'POST',
@@ -179,20 +177,41 @@ const UserTable = () => {
           body: JSON.stringify({ status: newStatus }),
         }
       );
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || `Error ${response.status}`);
-
-      // Recarga la tabla después de cambiar estado
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Error al cambiar estado');
       fetchData();
     } catch (err) {
-      console.error(`Error al ${newStatus === 'activo' ? 'habilitar' : 'suspender'} usuario:`, err.message);
+      console.error('Error al cambiar estado del usuario:', err);
+    }
+  };
+
+  // Eliminar usuario
+  const deleteUser = async id => {
+    try {
+      const token = localStorage.getItem('userToken');
+      if (!token) throw new Error('No se encontró token');
+
+      const res = await fetch(
+        `https://xn--urkupia-9za.online/api/users/delete/${id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Error al eliminar');
+      fetchData();
+    } catch (err) {
+      console.error('Error al eliminar usuario:', err);
     }
   };
 
   const columns = [
     {
-      title: 'Name',
+      title: 'Nombre',
       dataIndex: 'name',
       key: 'name',
       ...getColumnSearchProps('name'),
@@ -202,6 +221,18 @@ const UserTable = () => {
       dataIndex: 'puesto',
       key: 'puesto',
       ...getColumnSearchProps('puesto'),
+    },
+    {
+      title: 'Fila',
+      dataIndex: 'fila',
+      key: 'fila',
+      ...getColumnSearchProps('fila'),
+    },
+    {
+      title: 'Pasillo',
+      dataIndex: 'pasillo',
+      key: 'pasillo',
+      ...getColumnSearchProps('pasillo'),
     },
     {
       title: 'Créditos',
@@ -227,8 +258,8 @@ const UserTable = () => {
             value={record.creditosACargar}
             onChange={e => {
               const newData = [...dataSource];
-              const index = newData.findIndex(item => record.id === item.id);
-              newData[index].creditosACargar = e.target.value;
+              const idx = newData.findIndex(item => item.id === record.id);
+              newData[idx].creditosACargar = e.target.value;
               setDataSource(newData);
             }}
             placeholder="Cargar créditos"
@@ -242,10 +273,13 @@ const UserTable = () => {
               Suspender
             </Button>
           ) : (
-            <Button type="default" onClick={() => updateUserStatus(record.id, 'activo')}>
+            <Button onClick={() => updateUserStatus(record.id, 'activo')}>
               Habilitar
             </Button>
           )}
+          <Button danger onClick={() => deleteUser(record.id)}>
+            Eliminar
+          </Button>
         </Space>
       ),
     },
@@ -259,7 +293,7 @@ const UserTable = () => {
           bordered
           dataSource={dataSource}
           columns={columns}
-          rowClassName="editable-row"
+          rowKey="id"
           pagination={{ pageSize: 10 }}
         />
       </Form>

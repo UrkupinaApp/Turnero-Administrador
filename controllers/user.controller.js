@@ -244,33 +244,74 @@ const userRecovery = (req,res)=>{
     }
 }
 
-const userDelete = (req,res)=>{
-    try {
-        // Obtener el ID del usuario a eliminar desde los parámetros de la solicitud
-        const userId = req.params.id;
-
-        // Eliminar el usuario de la base de datos
-        connection.query(
-            'DELETE FROM users WHERE id = ?',
+const deleteUser = (req, res) => {
+    const userId = req.params.id;
+  
+    connection.beginTransaction(err => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Error al iniciar transacción" });
+      }
+  
+      // 1) Borrar créditos
+      connection.query(
+        'DELETE FROM creditos WHERE user_id = ?',
+        [userId],
+        (err1) => {
+          if (err1) {
+            return connection.rollback(() => {
+              console.error(err1);
+              res.status(500).json({ message: "Error al borrar créditos" });
+            });
+          }
+  
+          // 2) Borrar turnos
+          connection.query(
+            'DELETE FROM turnos WHERE id_user = ?',
             [userId],
-            (error, results) => {
-                if (error) {
-                    console.error("Error al eliminar el usuario:", error);
-                    return res.status(500).json({ message: "Error al eliminar el usuario" });
+            (err2) => {
+              if (err2) {
+                return connection.rollback(() => {
+                  console.error(err2);
+                  res.status(500).json({ message: "Error al borrar turnos" });
+                });
+              }
+  
+              // 3) Borrar usuario
+              connection.query(
+                'DELETE FROM users WHERE id = ?',
+                [userId],
+                (err3, result3) => {
+                  if (err3) {
+                    return connection.rollback(() => {
+                      console.error(err3);
+                      res.status(500).json({ message: "Error al borrar usuario" });
+                    });
+                  }
+                  if (result3.affectedRows === 0) {
+                    return connection.rollback(() => {
+                      res.status(404).json({ message: "Usuario no encontrado" });
+                    });
+                  }
+                  // Commit
+                  connection.commit(err4 => {
+                    if (err4) {
+                      return connection.rollback(() => {
+                        console.error(err4);
+                        res.status(500).json({ message: "Error en commit" });
+                      });
+                    }
+                    res.status(200).json({ message: "Usuario y dependencias eliminados" });
+                  });
                 }
-                // Verificar si se eliminó algún registro
-                if (results.affectedRows === 0) {
-                    return res.status(404).json({ message: "El usuario no existe" });
-                }
-                res.status(200).json({ message: "Usuario eliminado con éxito" });
+              );
             }
-        );
-    } catch (error) {
-        console.error("Error al eliminar el usuario:", error);
-        res.status(500).json({ message: "Error al eliminar el usuario" });
-    }
-}
-
+          );
+        }
+      );
+    });
+  };
+  
 const userBanned = (req, res) => {
     try {
       const userId = req.params.id;
