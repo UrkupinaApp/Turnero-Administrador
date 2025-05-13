@@ -5,7 +5,9 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background:linear-gradient(rgba(116, 139, 237, 0.4),rgba(149, 90, 194, 0.4)), url('../assets/background.png');
+    background:linear-gradient(rgba(0, 0, 255, 0.098),rgba(5, 1, 255, 0.131)), url('../assets/bg-4.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
   }
   
   .login-form-container {
@@ -25,7 +27,9 @@
 
   .Titulo{
     text-align: center;
-    font-size: 32px;
-    font-weight: 600;
+    font-size: 42px;
+    font-weight: 800;
+    color: #ffff;
+    text-shadow: 1px 2px 3px rgba(0, 0, 0, 0.1);
   }
   
