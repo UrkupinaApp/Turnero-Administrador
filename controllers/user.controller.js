@@ -355,7 +355,7 @@ module.exports = {getAllUsers,
     userLogin,
     userRegister,
     userUpdate,
-    userDelete,
+    deleteUser,
     userRecovery,
     userBanned}
 
