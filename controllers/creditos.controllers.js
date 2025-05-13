@@ -231,11 +231,38 @@ const obtenerCreditosUsuario = (req, res) => {
     }
 };
 
+const getCreditLogs = (req, res) => {
+    const sql = `
+      SELECT 
+        cl.id,
+        cl.user_id,
+        u.name AS user_name,
+        cl.amount,
+        cl.description,
+        cl.admin_id,
+        a.username AS admin_username,
+        cl.created_at
+      FROM creditos_log cl
+      LEFT JOIN users u ON cl.user_id = u.id
+      LEFT JOIN admins a ON cl.admin_id = a.id
+      ORDER BY cl.created_at DESC
+    `;
+  
+    connection.query(sql, (err, results) => {
+      if (err) {
+        console.error('Error al obtener logs de créditos:', err);
+        return res.status(500).json({ message: 'Error al obtener registros de crédito' });
+      }
+      res.json(results);
+    });
+  };
+
 
 
 
 module.exports = {
     carga_credito,
     descarga_credito,
-    obtenerCreditosUsuario
+    obtenerCreditosUsuario,
+    getCreditLogs
 };

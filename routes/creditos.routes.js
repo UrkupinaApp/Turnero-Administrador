@@ -3,7 +3,7 @@ const Express = require('express')
 const creditosRouter = Express.Router()
 
 
-const {carga_credito, descarga_credito, obtenerCreditosUsuario} = require('../controllers/creditos.controllers')
+const {carga_credito, descarga_credito, obtenerCreditosUsuario, getCreditLogs} = require('../controllers/creditos.controllers')
 const adminMiddlewear = require('../middlewears/admin.middlewear')
 
 creditosRouter.get('/',(req,res)=>{
@@ -15,6 +15,7 @@ creditosRouter.post("/carga/:id",carga_credito)
 creditosRouter.put("/update/:id",descarga_credito)
 
 creditosRouter.get("/:id",obtenerCreditosUsuario)
+creditosRouter.get ("/registro",getCreditLogs)
 
 
 
