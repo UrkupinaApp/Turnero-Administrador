@@ -52,7 +52,7 @@ const connection = require('../db/db.connection');
 };
 
  */
-const carga_credito = (req, res) => {
+/* const carga_credito = (req, res) => {
     try {
         const { id } = req.params;
         const { creditos } = req.body;
@@ -106,7 +106,57 @@ const carga_credito = (req, res) => {
         res.status(500).json({ message: "Error al cargar el crédito" });
     }
 };
+ */
 
+
+
+
+const carga_credito = (req, res) => {
+    const userId = req.params.id;
+    const { creditos } = req.body;         // cantidad a cargar
+    const adminId = req.user?.id || null;  // suposición: tienes middleware JWT que pone req.user
+  
+    connection.beginTransaction(err => {
+      if (err) return res.status(500).json({ message: "Error al iniciar transacción" });
+  
+      // 1) Actualizar créditos en la tabla principal
+      connection.query(
+        'UPDATE users SET creditos = creditos + ? WHERE id = ?',
+        [creditos, userId],
+        (err1, result1) => {
+          if (err1) return connection.rollback(() => res.status(500).json({ message: "Error al actualizar créditos" }));
+  
+          // 2) Insertar en el log
+          connection.query(
+            `INSERT INTO creditos_log
+               (user_id, amount, admin_id, description)
+             VALUES (?, ?, ?, ?)`,
+            [userId, creditos, adminId, req.body.description || null],
+            (err2) => {
+              if (err2) {
+                return connection.rollback(() => {
+                  console.error(err2);
+                  return res.status(500).json({ message: "Error al registrar en log" });
+                });
+              }
+  
+              // 3) Commit final
+              connection.commit(err3 => {
+                if (err3) {
+                  return connection.rollback(() => {
+                    console.error(err3);
+                    return res.status(500).json({ message: "Error en commit" });
+                  });
+                }
+                res.status(200).json({ message: "Créditos recargados y registro guardado" });
+              });
+            }
+          );
+        }
+      );
+    });
+  };
+  
 
 const descarga_credito = (req, res) => {
     try {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
-import { Table, Input, Form, Button, Space } from 'antd';
+import { Table, Input, Form, Button, Space, message } from 'antd';
 import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
 
@@ -76,6 +76,7 @@ const UserTable = () => {
       setDataSource(data);
     } catch (err) {
       console.error('Error al obtener usuarios:', err);
+      message.error('No se pudieron cargar los usuarios');
     }
   };
 
@@ -154,9 +155,11 @@ const UserTable = () => {
       );
       if (!res.ok) throw new Error('Error en la petición');
       await res.json();
+      message.success('Créditos actualizados');
       fetchData();
     } catch (err) {
       console.error('Error al actualizar créditos:', err);
+      message.error('No se pudieron actualizar los créditos');
     }
   };
 
@@ -179,9 +182,15 @@ const UserTable = () => {
       );
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Error al cambiar estado');
+      message.success(
+        newStatus === 'activo'
+          ? 'Usuario habilitado'
+          : 'Usuario suspendido'
+      );
       fetchData();
     } catch (err) {
       console.error('Error al cambiar estado del usuario:', err);
+      message.error('No se pudo cambiar el estado del usuario');
     }
   };
 
@@ -202,10 +211,15 @@ const UserTable = () => {
         }
       );
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Error al eliminar');
+      if (!res.ok) {
+        message.error(data.message || 'Error al eliminar usuario');
+        return;
+      }
+      message.success('Usuario eliminado con éxito');
       fetchData();
     } catch (err) {
       console.error('Error al eliminar usuario:', err);
+      message.error('No se pudo eliminar el usuario');
     }
   };
 
