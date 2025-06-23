@@ -153,51 +153,121 @@ const userRegister = async (req, res) => {
 
 const userRegister = async (req, res) => {
   try {
-      const {
-          name, apellido, password, celular, dni, email = '',
-          fila, pasillo, puesto, tipo_propietario, uso, inquilinos, tamano_puesto
-      } = req.body;
+    const {
+      name, apellido, password, celular, dni, email = '',
+      fila, pasillo, puesto, tipo_propietario, uso, inquilinos, tamano_puesto
+    } = req.body;
 
-      // Validación básica
-      if (!name || !apellido || !password || !celular || !dni || !fila || !pasillo || !puesto || !tipo_propietario || !uso || !tamano_puesto) {
-          return res.status(400).json({ message: "Todos los campos obligatorios deben estar completos" });
+    // Validación básica
+    if (!name || !apellido || !password || !celular || !dni || !fila || !pasillo || !puesto || !tipo_propietario || !uso || !tamano_puesto) {
+      return res.status(400).json({ message: "Todos los campos obligatorios deben estar completos" });
+    }
+
+    // Validar tamaño de puesto (solo 2 o 4 permitidos)
+    if (![2, 4, "2", "4"].includes(tamano_puesto)) {
+      return res.status(400).json({ message: "El tamaño del puesto debe ser 2 o 4 metros" });
+    }
+
+    // Validar inquilinos si es ALQUILA
+    if (uso === 'ALQUILA' && (!Array.isArray(inquilinos) || inquilinos.length === 0)) {
+      return res.status(400).json({ message: "Debe agregar al menos 1 inquilino si el uso es ALQUILA" });
+    }
+    if (Array.isArray(inquilinos) && inquilinos.length > 2) {
+      return res.status(400).json({ message: "Solo se pueden agregar hasta 2 inquilinos" });
+    }
+
+    // Validar usuario existente (por nombre, celular o DNI)
+    connection.query(
+      'SELECT * FROM users WHERE name = ? OR celular = ? OR dni = ?',
+      [name, celular, dni],
+      async (err, results) => {
+        if (err) return res.status(500).json({ message: "Error al verificar el usuario" });
+        if (results.length > 0) return res.status(400).json({ message: "El usuario ya está registrado" });
+
+        const hashedPass = await bcrypt.hash(password, 10);
+
+        // Insertar propietario
+        const propietarioData = [
+          name, apellido, hashedPass, 20, celular, dni, email, fila, pasillo,
+          puesto, tipo_propietario, uso, tamano_puesto, // hasta acá datos fijos
+          JSON.stringify(inquilinos || []), // en columna inquilinos, para trazabilidad
+          null // user_id_propietario: NULL porque es el dueño principal
+        ];
+
+        connection.query(
+          `INSERT INTO users 
+            (name, apellido, password, creditos, celular, dni, email, fila, pasillo, puesto, tipo_propietario, uso, tamano_puesto, inquilinos, user_id_propietario)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          propietarioData,
+          (err2, result) => {
+            if (err2) return res.status(500).json({ message: "Error al insertar propietario" });
+
+            const propietarioId = result.insertId;
+
+            // Ahora insertar los inquilinos como usuarios independientes
+            if (Array.isArray(inquilinos) && inquilinos.length > 0) {
+              inquilinos.forEach(async (inquilino) => {
+                // Chequeo rápido: si ya existe el DNI del inquilino, no lo vuelvas a registrar
+                connection.query(
+                  'SELECT * FROM users WHERE dni = ?',
+                  [inquilino.dni],
+                  async (err3, results3) => {
+                    if (err3) {
+                      console.error("Error al verificar inquilino:", err3);
+                      return;
+                    }
+                    if (results3.length > 0) {
+                      // Si ya existe, no hacer nada (o podrías actualizar si querés)
+                      return;
+                    }
+
+                    const hashedInquilinoPass = await bcrypt.hash(inquilino.dni, 10); // contraseña = dni
+                    const inquilinoData = [
+                      inquilino.name,
+                      inquilino.apellido,
+                      hashedInquilinoPass,
+                      13, // creditos
+                      inquilino.celular,
+                      inquilino.dni,
+                      inquilino.email || '',
+                      fila,
+                      pasillo,
+                      puesto,
+                      "INQUILINO",
+                      "USO PROPIO",
+                      tamano_puesto,
+                      null, // columna inquilinos, vacío para los inquilinos
+                      propietarioId // user_id_propietario
+                    ];
+
+                    connection.query(
+                      `INSERT INTO users 
+                        (name, apellido, password, creditos, celular, dni, email, fila, pasillo, puesto, tipo_propietario, uso, tamano_puesto, inquilinos, user_id_propietario)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                      inquilinoData,
+                      (err4) => {
+                        if (err4) {
+                          console.error("Error al insertar inquilino:", err4);
+                        }
+                      }
+                    );
+                  }
+                );
+              });
+            }
+
+            // Finalmente respondemos al frontend
+            res.status(201).json({ message: "Propietario e inquilinos registrados" });
+          }
+        );
       }
-
-      // Validar tamaño de puesto (solo 2 o 4 permitidos)
-      if (![2, 4, "2", "4"].includes(tamano_puesto)) {
-          return res.status(400).json({ message: "El tamaño del puesto debe ser 2 o 4 metros" });
-      }
-
-      // Validar inquilinos si es ALQUILA
-      if (uso === 'ALQUILA' && (!Array.isArray(inquilinos) || inquilinos.length === 0)) {
-          return res.status(400).json({ message: "Debe agregar al menos 1 inquilino si el uso es ALQUILA" });
-      }
-      if (Array.isArray(inquilinos) && inquilinos.length > 2) {
-          return res.status(400).json({ message: "Solo se pueden agregar hasta 2 inquilinos" });
-      }
-
-      // Validar usuario existente
-      connection.query('SELECT * FROM users WHERE name = ? OR celular = ? OR dni = ?', [name, celular, dni], async (err, results) => {
-          if (err) return res.status(500).json({ message: "Error al verificar el usuario" });
-          if (results.length > 0) return res.status(400).json({ message: "El usuario ya está registrado" });
-
-          const hashedPass = await bcrypt.hash(password, 10);
-          const inquilinosJSON = JSON.stringify(inquilinos);
-
-          connection.query(
-              // OJO con el orden: tamano_puesto ANTES de inquilinos si así está en la tabla
-              'INSERT INTO users (name, apellido, password, creditos, celular, dni, email, fila, pasillo, puesto, tipo_propietario, uso, tamano_puesto, inquilinos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-              [name, apellido, hashedPass, 20, celular, dni, email, fila, pasillo, puesto, tipo_propietario, uso, tamano_puesto, inquilinosJSON],
-              (err, results) => {
-                  if (err) return res.status(500).json({ message: "Error al insertar usuario" });
-                  res.status(201).json({ message: "Nuevo usuario registrado" });
-              }
-          );
-      });
+    );
   } catch (error) {
-      res.status(500).json({ message: "Error al crear el usuario" });
+    console.error("Error general:", error);
+    res.status(500).json({ message: "Error al crear el usuario" });
   }
 };
+
 
 
 const userUpdate = async (req,res)=>{
