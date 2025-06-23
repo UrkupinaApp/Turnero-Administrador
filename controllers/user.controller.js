@@ -150,7 +150,6 @@ const userRegister = async (req, res) => {
 };
  */
 
-
 const userRegister = async (req, res) => {
   try {
     const {
@@ -199,61 +198,76 @@ const userRegister = async (req, res) => {
             (name, apellido, password, creditos, celular, dni, email, fila, pasillo, puesto, tipo_propietario, uso, tamano_puesto, inquilinos, user_id_propietario)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           propietarioData,
-          (err2, result) => {
-            if (err2) return res.status(500).json({ message: "Error al insertar propietario" });
+          async (err2, result) => {
+            if (err2) {
+              console.error("Error al insertar propietario:", err2);
+              return res.status(500).json({ message: "Error al insertar propietario" });
+            }
 
             const propietarioId = result.insertId;
 
             // Ahora insertar los inquilinos como usuarios independientes
             if (Array.isArray(inquilinos) && inquilinos.length > 0) {
-              inquilinos.forEach(async (inquilino) => {
+              console.log("Registrando inquilinos:", inquilinos);
+              for (const inquilino of inquilinos) {
                 // Chequeo rápido: si ya existe el DNI del inquilino, no lo vuelvas a registrar
-                connection.query(
-                  'SELECT * FROM users WHERE dni = ?',
-                  [inquilino.dni],
-                  async (err3, results3) => {
-                    if (err3) {
-                      console.error("Error al verificar inquilino:", err3);
-                      return;
-                    }
-                    if (results3.length > 0) {
-                      // Si ya existe, no hacer nada (o podrías actualizar si querés)
-                      return;
-                    }
-
-                    const hashedInquilinoPass = await bcrypt.hash(inquilino.dni, 10); // contraseña = dni
-                    const inquilinoData = [
-                      inquilino.name,
-                      inquilino.apellido,
-                      hashedInquilinoPass,
-                      13, // creditos
-                      inquilino.celular,
-                      inquilino.dni,
-                      inquilino.email || '',
-                      fila,
-                      pasillo,
-                      puesto,
-                      "INQUILINO",
-                      "USO PROPIO",
-                      tamano_puesto,
-                      null, // columna inquilinos, vacío para los inquilinos
-                      propietarioId // user_id_propietario
-                    ];
-
-                    connection.query(
-                      `INSERT INTO users 
-                        (name, apellido, password, creditos, celular, dni, email, fila, pasillo, puesto, tipo_propietario, uso, tamano_puesto, inquilinos, user_id_propietario)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                      inquilinoData,
-                      (err4) => {
-                        if (err4) {
-                          console.error("Error al insertar inquilino:", err4);
-                        }
+                await new Promise((resolve) => {
+                  connection.query(
+                    'SELECT * FROM users WHERE dni = ?',
+                    [inquilino.dni],
+                    async (err3, results3) => {
+                      if (err3) {
+                        console.error("Error al verificar inquilino:", err3);
+                        return resolve();
                       }
-                    );
-                  }
-                );
-              });
+                      if (results3.length > 0) {
+                        console.log(`El inquilino con DNI ${inquilino.dni} ya existe. No se registra de nuevo.`);
+                        return resolve();
+                      }
+
+                      // Validar datos mínimos del inquilino
+                      if (!inquilino.name || !inquilino.apellido || !inquilino.dni || !inquilino.celular) {
+                        console.log("Datos incompletos para inquilino, se omite:", inquilino);
+                        return resolve();
+                      }
+
+                      const hashedInquilinoPass = await bcrypt.hash(inquilino.dni.toString(), 10); // contraseña = dni
+                      const inquilinoData = [
+                        inquilino.name,
+                        inquilino.apellido,
+                        hashedInquilinoPass,
+                        13, // creditos
+                        inquilino.celular,
+                        inquilino.dni,
+                        inquilino.email || '',
+                        fila,
+                        pasillo,
+                        puesto,
+                        "INQUILINO",
+                        "USO PROPIO",
+                        tamano_puesto,
+                        null, // columna inquilinos, vacío para los inquilinos
+                        propietarioId // user_id_propietario
+                      ];
+
+                      connection.query(
+                        `INSERT INTO users 
+                          (name, apellido, password, creditos, celular, dni, email, fila, pasillo, puesto, tipo_propietario, uso, tamano_puesto, inquilinos, user_id_propietario)
+                          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                        inquilinoData,
+                        (err4) => {
+                          if (err4) {
+                            console.error("Error al insertar inquilino:", err4);
+                          } else {
+                            console.log(`Inquilino ${inquilino.name} registrado correctamente.`);
+                          }
+                          resolve();
+                        }
+                      );
+                    }
+                  );
+                });
+              }
             }
 
             // Finalmente respondemos al frontend
@@ -267,7 +281,6 @@ const userRegister = async (req, res) => {
     res.status(500).json({ message: "Error al crear el usuario" });
   }
 };
-
 
 
 const userUpdate = async (req,res)=>{

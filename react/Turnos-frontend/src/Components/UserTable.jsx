@@ -232,6 +232,18 @@ const UserTable = () => {
       ...getColumnSearchProps('name'),
     },
     {
+      title: 'Tipo',
+      dataIndex: 'tipo_propietario',
+      key: 'tipo_propietario',
+      render: tipo => tipo === 'INQUILINO' ? 'Sub Inquilino' : (tipo === 'PROPIETARIO' ? 'Propietario' : tipo),
+      filters: [
+        { text: 'Propietario', value: 'PROPIETARIO' },
+        { text: 'Socio', value: 'SOCIO' },
+        { text: 'Sub Inquilino', value: 'INQUILINO' }
+      ],
+      onFilter: (value, record) => record.tipo_propietario === value,
+    },
+    {
       title: 'Puesto',
       dataIndex: 'puesto',
       key: 'puesto',
@@ -284,14 +296,13 @@ const UserTable = () => {
             Cargar
           </Button>
           {record.status === 'activo' ? (
-         <Button
-         type="dashed"
-         onClick={() => updateUserStatus(record.id, 'inactivo')}
-         style={{ borderColor: 'orange', color: 'white', background:"orange" }}
-       >
-         Suspender
-       </Button>
-       
+            <Button
+              type="dashed"
+              onClick={() => updateUserStatus(record.id, 'inactivo')}
+              style={{ borderColor: 'orange', color: 'white', background:"orange" }}
+            >
+              Suspender
+            </Button>
           ) : (
             <Button onClick={() => updateUserStatus(record.id, 'activo')}>
               Habilitar

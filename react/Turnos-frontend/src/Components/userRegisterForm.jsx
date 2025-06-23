@@ -20,9 +20,10 @@ const RegisterUserForm = () => {
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      const data = { 
+      const data = {
         ...values,
         uso,
+        tamano_puesto: Number(values.tamano_puesto), // aseguramos número
         inquilinos: uso === 'ALQUILA' ? values.inquilinos || [] : [],
         creditos: 20
       };
@@ -99,14 +100,26 @@ const RegisterUserForm = () => {
       </Row>
 
       <Row gutter={16}>
-        <Col span={8}>
+        <Col span={6}>
           <Form.Item label="Fila" name="fila" rules={[{ required: true, message: 'Ingrese la fila' }]}><Input /></Form.Item>
         </Col>
-        <Col span={8}>
+        <Col span={6}>
           <Form.Item label="Pasillo" name="pasillo" rules={[{ required: true, message: 'Ingrese pasillo' }]}><Input /></Form.Item>
         </Col>
-        <Col span={8}>
+        <Col span={6}>
           <Form.Item label="Puesto" name="puesto" rules={[{ required: true, message: 'Ingrese puesto' }]}><Input /></Form.Item>
+        </Col>
+        <Col span={6}>
+          <Form.Item
+            label="Tamaño del Puesto (mts)"
+            name="tamano_puesto"
+            rules={[{ required: true, message: 'Seleccione el tamaño del puesto' }]}
+          >
+            <Select placeholder="Seleccione tamaño">
+              <Option value={2}>2 metros</Option>
+              <Option value={4}>4 metros</Option>
+            </Select>
+          </Form.Item>
         </Col>
       </Row>
 
