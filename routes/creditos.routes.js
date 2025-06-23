@@ -15,6 +15,7 @@ creditosRouter.post("/carga/:id",carga_credito)
 creditosRouter.put("/update/:id",descarga_credito)
 
 creditosRouter.get("/:id",obtenerCreditosUsuario)
+
 creditosRouter.get ("/registro",getCreditLogs)
 
 

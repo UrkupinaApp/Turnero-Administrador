@@ -8,7 +8,7 @@ import {
   UserOutlined,
   LogoutOutlined,
 } from '@ant-design/icons';
-import FotoPerfin from '../assets/avatar.jpg';
+import FotoPerfin from '../assets/icon.png';
 import { useAuthContext } from '../context/AuthContext';
 import '../css/Layout.css';
 
@@ -57,7 +57,7 @@ const AppLayout = ({ children }) => {
           width={200}
         >
           <Menu
-            theme="dark"
+            theme="ligth"
             mode="inline"
             selectedKeys={[window.location.pathname.split('/').pop()]}
             items={menuItems}

@@ -107,7 +107,7 @@ const userRegister = async (req, res) => {
     }
 }; */
 
-const userRegister = async (req, res) => {
+/* const userRegister = async (req, res) => {
     console.log("registrando")
     try {
         const { name, password, celular, dni, email, fila, pasillo, puesto } = req.body;
@@ -148,7 +148,51 @@ const userRegister = async (req, res) => {
         res.status(500).json({ message: "Error al crear el usuario" });
     }
 };
+ */
 
+
+const userRegister = async (req, res) => {
+  try {
+      const {
+          name, apellido, password, celular, dni, email = '',
+          fila, pasillo, puesto, tipo_propietario, uso, inquilinos = []
+      } = req.body;
+
+      // Validación básica
+      if (!name || !apellido || !password || !celular || !dni || !fila || !pasillo || !puesto || !tipo_propietario || !uso) {
+          return res.status(400).json({ message: "Todos los campos obligatorios deben estar completos" });
+      }
+
+      // Validar inquilinos si es ALQUILA
+      if (uso === 'ALQUILA' && (!Array.isArray(inquilinos) || inquilinos.length === 0)) {
+          return res.status(400).json({ message: "Debe agregar al menos 1 inquilino si el uso es ALQUILA" });
+      }
+      if (inquilinos.length > 2) {
+          return res.status(400).json({ message: "Solo se pueden agregar hasta 2 inquilinos" });
+      }
+
+      // Validar usuario existente
+      connection.query('SELECT * FROM users WHERE name = ? OR celular = ? OR dni = ?', [name, celular, dni], async (err, results) => {
+          if (err) return res.status(500).json({ message: "Error al verificar el usuario" });
+          if (results.length > 0) return res.status(400).json({ message: "El usuario ya está registrado" });
+
+          const hashedPass = await bcrypt.hash(password, 10);
+          // Guardar los inquilinos como JSON en la columna 'inquilinos' (debe ser tipo TEXT)
+          const inquilinosJSON = JSON.stringify(inquilinos);
+
+          connection.query(
+              'INSERT INTO users (name, apellido, password, creditos, celular, dni, email, fila, pasillo, puesto, tipo_propietario, uso, inquilinos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+              [name, apellido, hashedPass, 20, celular, dni, email, fila, pasillo, puesto, tipo_propietario, uso, inquilinosJSON],
+              (err, results) => {
+                  if (err) return res.status(500).json({ message: "Error al insertar usuario" });
+                  res.status(201).json({ message: "Nuevo usuario registrado" });
+              }
+          );
+      });
+  } catch (error) {
+      res.status(500).json({ message: "Error al crear el usuario" });
+  }
+};
 
 
 const userUpdate = async (req,res)=>{

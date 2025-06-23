@@ -283,9 +283,14 @@ const UserTable = () => {
             Cargar
           </Button>
           {record.status === 'activo' ? (
-            <Button danger onClick={() => updateUserStatus(record.id, 'inactivo')}>
-              Suspender
-            </Button>
+         <Button
+         type="dashed"
+         onClick={() => updateUserStatus(record.id, 'inactivo')}
+         style={{ borderColor: 'orange', color: 'white', background:"orange" }}
+       >
+         Suspender
+       </Button>
+       
           ) : (
             <Button onClick={() => updateUserStatus(record.id, 'activo')}>
               Habilitar
