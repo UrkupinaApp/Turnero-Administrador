@@ -155,19 +155,24 @@ const userRegister = async (req, res) => {
   try {
       const {
           name, apellido, password, celular, dni, email = '',
-          fila, pasillo, puesto, tipo_propietario, uso, inquilinos = []
+          fila, pasillo, puesto, tipo_propietario, uso, inquilinos, tamano_puesto
       } = req.body;
 
       // Validación básica
-      if (!name || !apellido || !password || !celular || !dni || !fila || !pasillo || !puesto || !tipo_propietario || !uso) {
+      if (!name || !apellido || !password || !celular || !dni || !fila || !pasillo || !puesto || !tipo_propietario || !uso || !tamano_puesto) {
           return res.status(400).json({ message: "Todos los campos obligatorios deben estar completos" });
+      }
+
+      // Validar tamaño de puesto (solo 2 o 4 permitidos)
+      if (![2, 4, "2", "4"].includes(tamano_puesto)) {
+          return res.status(400).json({ message: "El tamaño del puesto debe ser 2 o 4 metros" });
       }
 
       // Validar inquilinos si es ALQUILA
       if (uso === 'ALQUILA' && (!Array.isArray(inquilinos) || inquilinos.length === 0)) {
           return res.status(400).json({ message: "Debe agregar al menos 1 inquilino si el uso es ALQUILA" });
       }
-      if (inquilinos.length > 2) {
+      if (Array.isArray(inquilinos) && inquilinos.length > 2) {
           return res.status(400).json({ message: "Solo se pueden agregar hasta 2 inquilinos" });
       }
 
@@ -177,12 +182,12 @@ const userRegister = async (req, res) => {
           if (results.length > 0) return res.status(400).json({ message: "El usuario ya está registrado" });
 
           const hashedPass = await bcrypt.hash(password, 10);
-          // Guardar los inquilinos como JSON en la columna 'inquilinos' (debe ser tipo TEXT)
           const inquilinosJSON = JSON.stringify(inquilinos);
 
           connection.query(
-              'INSERT INTO users (name, apellido, password, creditos, celular, dni, email, fila, pasillo, puesto, tipo_propietario, uso, inquilinos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-              [name, apellido, hashedPass, 20, celular, dni, email, fila, pasillo, puesto, tipo_propietario, uso, inquilinosJSON],
+              // OJO con el orden: tamano_puesto ANTES de inquilinos si así está en la tabla
+              'INSERT INTO users (name, apellido, password, creditos, celular, dni, email, fila, pasillo, puesto, tipo_propietario, uso, tamano_puesto, inquilinos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+              [name, apellido, hashedPass, 20, celular, dni, email, fila, pasillo, puesto, tipo_propietario, uso, tamano_puesto, inquilinosJSON],
               (err, results) => {
                   if (err) return res.status(500).json({ message: "Error al insertar usuario" });
                   res.status(201).json({ message: "Nuevo usuario registrado" });

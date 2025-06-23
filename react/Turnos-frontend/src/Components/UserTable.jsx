@@ -74,6 +74,7 @@ const UserTable = () => {
       const res = await fetch('https://xn--urkupia-9za.online/api/users/');
       const data = await res.json();
       setDataSource(data);
+      console.log(data)
     } catch (err) {
       console.error('Error al obtener usuarios:', err);
       message.error('No se pudieron cargar los usuarios');
