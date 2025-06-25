@@ -23,12 +23,13 @@ const RegisterUserForm = () => {
       const data = {
         ...values,
         uso,
-        tamano_puesto: Number(values.tamano_puesto), // aseguramos número
+        tamano_puesto: Number(values.tamano_puesto),
         inquilinos: uso === 'ALQUILA' ? values.inquilinos || [] : [],
         creditos: 20
       };
 
       const response = await axios.post('https://xn--urkupia-9za.online/api/users/register', data);
+      console.log(data)
       message.success(response.data.message);
     } catch (error) {
       message.error(error.response?.data?.message || 'Error al registrar usuario');
@@ -142,6 +143,11 @@ const RegisterUserForm = () => {
               </Col>
               <Col span={4}>
                 <Form.Item name={["inquilinos", idx, "email"]} rules={[{ type: 'email', message: 'Email inválido' }]}><Input placeholder="Email (opcional)" /></Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item name={["inquilinos", idx, "password"]} rules={[{ required: true, message: 'Contraseña' }]}>
+                  <Input.Password placeholder="Contraseña" />
+                </Form.Item>
               </Col>
               <Col span={2}>
                 <Button onClick={() => handleRemoveInquilino(idx)}>-</Button>

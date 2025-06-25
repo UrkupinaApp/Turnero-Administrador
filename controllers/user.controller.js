@@ -32,47 +32,60 @@ const getAllUsers = (req,res)=>{
 
 //el login requiere el username o el telefono para buscar el usuario en la bd
 const userLogin = async (req, res) => {
-    try {
-        //tener en cuenta en el front..
-        const { usernameOrPhone, password } = req.body;
-        console.log(usernameOrPhone,password)
-        if (!usernameOrPhone || !password) {
-            return res.status(400).json({ message: "Nombre de usuario o teléfono y contraseña son requeridos" });
-        }
+  try {
+      const { tipo_login, identificador, password } = req.body;
 
-        // Verificar si el usuario existe en la base de datos utilizando el nombre de usuario o el número de teléfono
-        connection.query('SELECT * FROM users WHERE name = ? OR celular = ?', [usernameOrPhone, usernameOrPhone], async (err, results) => {
-            if (err) {
-                return res.status(500).json({ message: "Error al buscar el usuario" });
-            }
+      if (!tipo_login || !identificador || !password) {
+          return res.status(400).json({ message: "Faltan datos de login" });
+      }
 
-            // Si no se encontró ningún usuario con los datos proporcionados, devolver un mensaje de error
-            if (results.length === 0) {
-                return res.status(404).json({ message: "Usuario no encontrado" });
-            }
+      // Definir query y params según tipo_login
+      let query = '';
+      let param = identificador;
 
-            // Verificar la contraseña
-            const user = results[0];
-            console.log(user)
-            const passwordMatch = await bcrypt.compare(password, user.password);
-            if (!passwordMatch) {
-                return res.status(401).json({ message: "Credenciales inválidas" });
-            }
+      if (tipo_login === 'dni') {
+          query = 'SELECT * FROM users WHERE dni = ?';
+      } else if (tipo_login === 'email') {
+          query = 'SELECT * FROM users WHERE email = ?';
+      } else if (tipo_login === 'celular') {
+          query = 'SELECT * FROM users WHERE celular = ?';
+      } else {
+          return res.status(400).json({ message: "Tipo de login inválido" });
+      }
 
-            // Generar un token JWT con una expiración de 1 hora
-            if(user.status === "activo"){
-            const token = jwt.sign({ userId: user.id,username:user.name,DNI:user.dni,Tel:user.celular}, process.env.JWT_SECRET, { expiresIn: '3h' });
-            const dataUser= {}
-            res.status(200).json({ token,"id":user.id,"creditos":user.creditos });
-        }else{
-            res.status(401).json({message:"su usuario esta inactivo"})
-        }
-        });
-    } catch (error) {
-        console.error("Error al iniciar sesión:", error);
-        res.status(500).json({ message: "Error al iniciar sesión" });
-    }
+      connection.query(query, [param], async (err, results) => {
+          if (err) {
+              return res.status(500).json({ message: "Error al buscar el usuario" });
+          }
+
+          if (results.length === 0) {
+              return res.status(404).json({ message: "Usuario no encontrado" });
+          }
+
+          const user = results[0];
+
+          const passwordMatch = await bcrypt.compare(password, user.password);
+          if (!passwordMatch) {
+              return res.status(401).json({ message: "Credenciales inválidas" });
+          }
+
+          if (user.status === "activo") {
+              const token = jwt.sign(
+                  { userId: user.id, username: user.name, DNI: user.dni, Tel: user.celular },
+                  process.env.JWT_SECRET,
+                  { expiresIn: '3h' }
+              );
+              res.status(200).json({ token, id: user.id, creditos: user.creditos });
+          } else {
+              res.status(401).json({ message: "Su usuario está inactivo" });
+          }
+      });
+  } catch (error) {
+      console.error("Error al iniciar sesión:", error);
+      res.status(500).json({ message: "Error al iniciar sesión" });
+  }
 };
+
 /* 
 const userRegister = async (req, res) => {
     try {
