@@ -35,12 +35,14 @@ const UserRoutes = require('./routes/users.routes');
 const turnosRouter = require('./routes/turnos.routes');
 const creditosRouter = require('./routes/creditos.routes');
 const cajasRouter = require('./routes/cajas.routes');
+const pushRoutes = require('./routes/push');
 
 app.use('/api/admin', AdminRouter);
 app.use('/api/users', UserRoutes);
 app.use('/api/turnos', turnosRouter);
 app.use('/api/creditos', creditosRouter);
 app.use('/api/cajas', cajasRouter);
+app.use('/api/push', pushRoutes);
 
 // Servir archivos estáticos de React
 app.use(express.static(distPath));
