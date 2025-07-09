@@ -1,0 +1,88 @@
+/* Contenedor principal */
+.clientes-main {
+    width: 100vw;
+    min-height: 100vh;
+    background: #f4f6fa;
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* Título */
+  .clientes-title {
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: #22334a;
+    margin: 48px auto 18px auto;
+    max-width: 80vw;
+    letter-spacing: 0.3px;
+  }
+  
+  /* Grid de 2 bloques verticales (form y tabla) */
+  .clientes-content-grid {
+    width: 80vw;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    
+  }
+  
+  /* Bloque blanco del form */
+  .clientes-form-block {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 32px rgba(44,68,118,0.10);
+    padding: 36px 36px 16px 36px;
+    width: 100%;
+    min-width: 320px;
+  }
+  
+  /* Bloque blanco de la tabla */
+  .clientes-table-block {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 32px rgba(44,68,118,0.10);
+    padding: 28px 24px 20px 24px;
+    width: 100%;
+    min-width: 320px;
+    min-height: 370px;
+  }
+  
+  /* Ajustes para los inputs del form */
+  .ant-form {
+    margin-bottom: 0;
+  }
+  
+  .ant-form-item {
+    margin-bottom: 14px;
+  }
+  
+  /* La tabla ocupa 100% */
+  .ant-table-wrapper {
+    width: 100%;
+  }
+  .ant-table {
+    background: transparent !important;
+  }
+  
+  @media (max-width: 1150px) {
+    .clientes-content-grid {
+      width: 98vw;
+      max-width: 99vw;
+      padding: 0 4px;
+    }
+    .clientes-title {
+      max-width: 99vw;
+      padding: 0 4px;
+    }
+  }
+  
+  @media (max-width: 800px) {
+    .clientes-content-grid {
+      gap: 16px;
+    }
+    .clientes-form-block, .clientes-table-block {
+      padding: 10px 2px 2px 2px;
+    }
+  }
+  

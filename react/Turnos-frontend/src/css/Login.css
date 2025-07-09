@@ -1,35 +1,136 @@
 /* Login.css */
-.login-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background:linear-gradient(rgba(0, 0, 255, 0.098),rgba(5, 1, 255, 0.131)), url('../assets/bg-4.jpg');
-    background-repeat: no-repeat;
-    background-size: cover;
-  }
-  
-  .login-form-container {
-    background: white;
-    padding: 34px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-  }
-  
-  .login-logo {
-    display: block;
-    margin: 0 auto 24px;
-    width: 180px;
-    height: auto;
-  }
 
-  .Titulo{
-    text-align: center;
-    font-size: 42px;
-    font-weight: 800;
-    color: #ffff;
-    text-shadow: 1px 2px 3px rgba(0, 0, 0, 0.1);
-  }
-  
+.login-bg {
+  min-height: 100vh;
+  width: 100vw;
+  background: #2C4476;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-card {
+  background: #f3f3f3;
+  padding: 48px 38px 38px 38px;
+  border-radius: 18px;
+  box-shadow: 0 6px 24px rgba(44,68,118,0.10);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 400px;
+  width: 420px;
+}
+
+.login-logo {
+  width: 220px;
+  margin-bottom: 4px;
+}
+
+.login-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 26px;
+  color: #222f3f;
+  text-align: center;
+}
+
+.ant-form {
+  width: 100%;
+}
+
+.ant-form-item {
+  margin-bottom: 18px;
+}
+
+/* INPUTS GENERALES */
+.ant-input,
+.ant-select-selector {
+  width: 100% !important;
+  height: 44px !important;
+  border-radius: 8px !important;
+  font-size: 16px;
+  padding: 3px 14px !important;
+  background: #fff !important;
+  border: 1.5px solid #e5e7eb !important;
+  box-shadow: none !important;
+  transition: border 0.2s;
+}
+
+/* ELIMINAR DOBLE BORDE EN INPUTS CON ICONOS Y PASSWORD */
+.ant-input-affix-wrapper,
+.ant-input-password {
+  width: 100% !important;
+  height: 44px !important;
+  border-radius: 8px !important;
+  font-size: 16px;
+  padding: 0 14px !important;
+  background: #fff !important;
+  border: 1.5px solid #e5e7eb !important;
+  box-shadow: none !important;
+  transition: border 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+/* Quita el borde del input interior */
+.ant-input-affix-wrapper > input.ant-input,
+.ant-input-password input {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  height: 42px !important;
+  padding: 0 !important;
+}
+
+/* Colores de foco y hover */
+.ant-input:focus,
+.ant-input-password:focus,
+.ant-select-focused .ant-select-selector,
+.ant-input-affix-wrapper-focused, 
+.ant-input-affix-wrapper:focus,
+.ant-input-affix-wrapper:hover {
+  border-color: #2366D1 !important;
+  box-shadow: none !important;
+}
+
+/* Selector caja */
+.ant-select-selector {
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* BOTÓN */
+.login-btn {
+  background: #156fe0 !important;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  height: 44px;
+  margin-top: 8px;
+  letter-spacing: 0.2px;
+  border: none;
+}
+
+.login-btn:hover, .login-btn:focus {
+  background: #0e53a6 !important;
+}
+
+.login-register {
+  margin-top: 14px;
+  font-size: 14px;
+  color: #9ca3af;
+  text-align: center;
+}
+
+.login-register-bold {
+  font-weight: bold;
+  color: #2366D1;
+  cursor: pointer;
+}
+
+/* ÍCONOS (si usás FontAwesome) */
+.fa-user, .fa-lock, .fa-cash-register {
+  color: #b3c0d5;
+  margin-right: 8px;
+  font-size: 17px;
+}

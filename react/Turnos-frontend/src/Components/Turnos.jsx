@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Row, Col, Modal } from 'antd';
+import { Card, Button, Row, Col, Modal, Tabs } from 'antd';
 import { ClockCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { useNavigate, useLocation } from 'react-router-dom';
 import '../css/Turnos.css';
+
+const { TabPane } = Tabs;
 
 function Turnos({ socket }) {
   const [turnosDisponibles, setTurnosDisponibles] = useState([]);
@@ -9,10 +12,13 @@ function Turnos({ socket }) {
   const [turnoLlamado, setTurnoLlamado] = useState(null);
   const [visible, setVisible] = useState(false);
 
+  const navigate = useNavigate();
+  const location = useLocation();
+
   useEffect(() => {
     // Función para actualizar los turnos
     const updateTurnos = (turnos) => {
-      const today = new Date().toISOString().split('T')[0]; // Obtener la fecha actual en formato YYYY-MM-DD
+      const today = new Date().toISOString().split('T')[0];
       const disponibles = turnos.filter(
         (turno) => {
           const turnoFecha = new Date(turno.fecha).toISOString().split('T')[0];
@@ -24,33 +30,26 @@ function Turnos({ socket }) {
       setTurnosEnCurso(enCurso);
     };
 
-    // Escuchar el evento de turnos desde el socket
     socket.on('turnos', updateTurnos);
 
-    // Escuchar el evento de turno llamado desde el socket
     socket.on('turnoLlamado', (turno) => {
       setTurnoLlamado(turno);
       setVisible(true);
 
-      // Mover el turno a "en curso" inmediatamente
       setTurnosDisponibles(prevTurnos => prevTurnos.filter(t => t.id !== turno.id));
       setTurnosEnCurso(prevTurnos => [...prevTurnos, { ...turno, status: 'en_curso' }]);
 
-      // Ocultar el popup después de 4 segundos
       setTimeout(() => {
         setVisible(false);
       }, 4000);
     });
 
-    // Emitir un evento para solicitar los turnos actualizados cada 3 segundos
     const intervalId = setInterval(() => {
-      socket.emit('requestTurnos'); // Emitir un evento para solicitar los turnos actualizados
-    }, 3000); // 3000 ms = 3 segundos
+      socket.emit('requestTurnos');
+    }, 3000);
 
-    // Emitir el evento inicialmente para obtener los datos cuando se carga el componente
     socket.emit('requestTurnos');
 
-    // Limpieza del socket y el intervalo en el desmontaje del componente
     return () => {
       socket.off('turnos');
       socket.off('turnoLlamado');
@@ -64,66 +63,74 @@ function Turnos({ socket }) {
 
   const completarTurno = (id) => {
     socket.emit('completarTurno', id);
-    // Actualizar los estados de los turnos en la UI
     setTurnosEnCurso(prevTurnos => prevTurnos.filter(t => t.id !== id));
   };
 
   const renderTurnoCard = (turno, isEnCurso) => (
     <Card
       key={turno.id}
-      style={{ marginBottom: 16 }}
+      className="turno-card"
       actions={[
         <Button onClick={() => isEnCurso ? completarTurno(turno.id) : llamarTurno(turno.id)}>
           {isEnCurso ? 'Completar' : 'Llamar'}
         </Button>
       ]}
+      bordered={false}
     >
       <Card.Meta
         avatar={isEnCurso ? <CheckCircleOutlined style={{ color: 'green' }} /> : <ClockCircleOutlined style={{ color: 'orange' }} />}
-        title={`Usuario: ${turno.user_name}`}
+        title={<span style={{ fontWeight: 600 }}>Usuario: {turno.user_name}</span>}
         description={
-          <>
-            <p>Código: {turno.cod_reserva}</p>
-            <p>Estado: {turno.status}</p>
-            <p>Motivo: {turno.motivo}</p>
-          </>
+          <div>
+            <span className="desc-label">Código:</span> {turno.cod_reserva}<br/>
+            <span className="desc-label">Estado:</span> {turno.status}<br/>
+            <span className="desc-label">Motivo:</span> {turno.motivo}
+          </div>
         }
       />
     </Card>
   );
 
+ 
   return (
-    <div className='content'>
-      <h2>Turnos Pendientes para Hoy</h2>
-      <Row gutter={[16, 16]}>
-        {turnosDisponibles.length > 0 ? (
-          turnosDisponibles.map((turno) => (
-            <Col span={8} key={turno.id}>
-              {renderTurnoCard(turno, false)}
-            </Col>
-          ))
-        ) : (
-          <Col span={24}><p>No hay turnos pendientes para hoy</p></Col>
-        )}
-      </Row>
+    <div className="turnos-page">
+    
 
-      <h2>Turnos en Curso</h2>
-      <Row gutter={[16, 16]}>
-        {turnosEnCurso.length > 0 ? (
-          turnosEnCurso.map((turno) => (
-            <Col span={8} key={turno.id}>
-              {renderTurnoCard(turno, true)}
-            </Col>
-          ))
-        ) : (
-          <Col span={24}><p>No hay turnos en curso</p></Col>
-        )}
-      </Row>
+      <div className="main-turnos-card">
+        <div className="turnos-section">
+          <h3 className="turnos-section-title">Turnos Pendientes para Hoy</h3>
+          <Row gutter={[8, 8]}>
+            {turnosDisponibles.length > 0 ? (
+              turnosDisponibles.map((turno) => (
+                <Col span={24} key={turno.id}>
+                  {renderTurnoCard(turno, false)}
+                </Col>
+              ))
+            ) : (
+              <Col span={24}><p className="turnos-empty">No hay turnos pendientes para hoy</p></Col>
+            )}
+          </Row>
+        </div>
 
-      {/* Popup para mostrar el turno llamado */}
+        <div className="turnos-section">
+          <h3 className="turnos-section-title">Turnos en Curso</h3>
+          <Row gutter={[8, 8]}>
+            {turnosEnCurso.length > 0 ? (
+              turnosEnCurso.map((turno) => (
+                <Col span={24} key={turno.id}>
+                  {renderTurnoCard(turno, true)}
+                </Col>
+              ))
+            ) : (
+              <Col span={24}><p className="turnos-empty">No hay turnos en curso</p></Col>
+            )}
+          </Row>
+        </div>
+      </div>
+
       <Modal
         title="Turno Llamado"
-        visible={visible}
+        open={visible}
         footer={null}
         onCancel={() => setVisible(false)}
       >

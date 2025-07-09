@@ -1,0 +1,86 @@
+.registro-bg {
+    min-height: 100%;
+    background: #f4f6fa;
+  
+  }
+  
+  .registro-card {
+    max-width: 1250px;
+    
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 6px 32px rgba(44, 68, 118, 0.10);
+    padding: 44px 46px 32px 46px;
+    min-height: 600px;
+  }
+  
+  .registro-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #243869;
+    margin-bottom: 32px;
+    letter-spacing: 0.02em;
+  }
+  
+  .registro-form .ant-form-item-label > label {
+    font-size: 1.07rem;
+    color: #243869;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  
+  .registro-form .ant-form-item-required {
+    color: #ea2328;
+  }
+  
+  .registro-form .ant-input,
+  .registro-form .ant-input-password,
+  .registro-form .ant-select-selector {
+    height: 46px !important;
+    border-radius: 10px !important;
+    font-size: 1.12rem;
+    background: #fafbfc;
+    border-color: #ececec !important;
+  }
+  
+  .registro-form .ant-select-selector {
+    display: flex;
+    align-items: center;
+  }
+  
+  .registro-form .ant-select-single .ant-select-selector .ant-select-selection-item {
+    display: flex;
+    align-items: center;
+  }
+  
+  .registro-form .ant-input:focus,
+  .registro-form .ant-input-password:focus,
+  .registro-form .ant-select-focused .ant-select-selector {
+    border-color: #2C4476 !important;
+    box-shadow: 0 0 0 2px #2C447622 !important;
+  }
+  
+  .registro-form .ant-form-item {
+    margin-bottom: 22px;
+  }
+  
+  .registro-inquilinos-card {
+    margin-top: 26px;
+    border-radius: 14px;
+  }
+  
+  .registro-submit-btn {
+    text-align: right;
+    margin-top: 20px;
+  }
+  
+  @media (max-width: 1100px) {
+    .registro-card {
+      max-width: 99vw;
+      padding: 24px 6vw 24px 6vw;
+    }
+    .registro-title {
+      font-size: 1.1rem;
+    }
+  }
+  

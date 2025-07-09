@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useAuthContext } from '../context/AuthContext';
-import { Form, Input, Button, Select, Row, Col } from 'antd';
+import { Form, Input, Button, Select } from 'antd';
 
+import '../css/Login.css';
 
-import '../css/Login.css'; // Asegúrate de crear y usar este archivo CSS para los estilos personalizados
-
-import UrkupinaLogo from '../assets/logo_64.png'
+import UrkupinaLogo from '../assets/logo_64.png';
 const { Option } = Select;
 
 const Login = () => {
@@ -17,11 +16,10 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container">
-
-      <h1 className='Titulo'>Sistema de Gestion de Turnos</h1>
-      <div className="login-form-container">
-        <img src= {UrkupinaLogo} alt="Logo" className="login-logo" /> {/* Reemplaza con la ruta de tu logo */}
+    <div className="login-bg">
+      <div className="login-card">
+        <img src={UrkupinaLogo} alt="Logo" className="login-logo" />
+        <h2 className="login-title">Bienvenido a Urkupiña</h2>
         <Form
           form={form}
           name="login"
@@ -32,30 +30,37 @@ const Login = () => {
             name="username"
             rules={[{ required: true, message: 'Por favor, ingrese su usuario' }]}
           >
-            <Input placeholder="Usuario" />
+            <Input prefix={<i className="fa fa-user" />} placeholder="Usuario" size="large" />
           </Form.Item>
           <Form.Item
             name="password"
             rules={[{ required: true, message: 'Por favor, ingrese su contraseña' }]}
           >
-            <Input.Password placeholder="Contraseña" />
+            <Input.Password prefix={<i className="fa fa-lock" />} placeholder="Contraseña" size="large" />
           </Form.Item>
           <Form.Item
             name="caja"
             rules={[{ required: true, message: 'Por favor, seleccione su caja' }]}
           >
-            <Select placeholder="Número de caja">
+            <Select
+              placeholder="Tipo de Caja"
+              size="large"
+              suffixIcon={<i className="fa fa-cash-register" />}
+            >
               {Array.from({ length: 12 }, (_, i) => (
-                <Option key={i + 1} value={i + 1}>{i + 1}</Option>
+                <Option key={i + 1} value={i + 1}>Caja {i + 1}</Option>
               ))}
             </Select>
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" block>
-              Login
+            <Button type="primary" htmlType="submit" block size="large" className="login-btn">
+              Iniciar Sesión
             </Button>
           </Form.Item>
         </Form>
+        <div className="login-register">
+          ¿No tienes una cuenta? <span className="login-register-bold">Regístrate</span>
+        </div>
       </div>
     </div>
   );

@@ -1,137 +1,137 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Table, Tag, Layout } from 'antd';
+import React, { useEffect, useState, useRef } from 'react';
+import { Table, Modal } from 'antd';
+import { AnimatePresence, motion } from "framer-motion";
 import io from 'socket.io-client';
 import '../css/PantallaAtencion.css';
 import video from '../assets/Video.mp4';
+import logo from '../assets/LOGONUEVO.png';
+import publi1 from '../assets/avatar.jpg';
+import publi2 from '../assets/logo.jpg';
+import publi3 from '../assets/icon.png';
+import publi4 from '../assets/logo_64.png';
 
-const { Sider, Content } = Layout;
+const PUBLICIDADES = [
+  { id: 1, img: publi1 },
+  { id: 2, img: publi2 },
+  { id: 3, img: publi3 },
+  { id: 4, img: publi4 }
+];
+
+const columns = [
+  {
+    title: <span className="tabla-header">Turno</span>,
+    dataIndex: 'cod_reserva',
+    key: 'cod_reserva',
+    render: text => <span className="tabla-turno">{text}</span>
+  },
+  {
+    title: <span className="tabla-header">Caja</span>,
+    dataIndex: 'caja',
+    key: 'caja',
+    align: 'center',
+    render: text => <span className="tabla-caja">{text}</span>
+  }
+];
 
 const PantallaAtencion = () => {
   const [turnos, setTurnos] = useState([]);
   const [turnoLlamado, setTurnoLlamado] = useState(null);
-  const [turnoEnCurso, setTurnoEnCurso] = useState([]);
+  const [currentPubli, setCurrentPubli] = useState(0);
+  const publiTimeout = useRef(null);
 
+  // SOCKET TURNOS
   useEffect(() => {
-    const socket = io('https://xn--urkupia-9za.online'); // Ajusta la URL si es necesario
-
-    // Función para actualizar los turnos
-    const updateTurnos = (data) => {
-      const today = new Date().toISOString().split('T')[0]; // Obtener la fecha actual en formato YYYY-MM-DD
-      const enCurso = data.filter(turno => turno.status === 'en_curso');
-      const pendientes = data.filter(turno => {
-        const turnoFecha = new Date(turno.fecha).toISOString().split('T')[0];
-        return turno.status === 'pendiente' && turnoFecha === today;
-      });
-      setTurnoEnCurso(enCurso);
-      setTurnos(pendientes);
-    };
-
-    // Escuchar el evento 'turnos' para actualizar la lista de turnos
-    socket.on('turnos', updateTurnos);
-
-    // Escuchar el evento 'turnoLlamado'
+    const socket = io('https://xn--urkupia-9za.online');
+    socket.on('turnos', (data) => setTurnos(data));
     socket.on('turnoLlamado', (turno) => {
       setTurnoLlamado(turno);
-      setTurnoEnCurso((prev) => [...prev, turno]);
-      setTurnos((prev) => prev.filter(t => t.id !== turno.id));
-      setTimeout(() => {
-        setTurnoLlamado(null);
-      }, 2000);
+      setTimeout(() => setTurnoLlamado(null), 2000);
     });
-
-    // Emitir un evento para solicitar los turnos actualizados cada 20 segundos
-    const intervalId = setInterval(() => {
-      socket.emit('requestTurnos'); // Emitir un evento para solicitar los turnos actualizados
-    }, 20000); // 20000 ms = 20 segundos
-
-    // Emitir el evento inicialmente para obtener los datos cuando se carga el componente
     socket.emit('requestTurnos');
-
-    // Limpieza del socket y el intervalo en el desmontaje del componente
+    const intervalId = setInterval(() => socket.emit('requestTurnos'), 20000);
     return () => {
-      socket.off('turnos');
-      socket.off('turnoLlamado');
+      socket.disconnect();
       clearInterval(intervalId);
-      socket.disconnect(); // Cerrar la conexión del socket
     };
   }, []);
 
+  // SLIDER con animación
+  useEffect(() => {
+    publiTimeout.current = setTimeout(() => {
+      setCurrentPubli(prev => (prev + 1) % PUBLICIDADES.length);
+    }, 6000);
+    return () => clearTimeout(publiTimeout.current);
+  }, [currentPubli]);
+
+  // SOLO TURNOS DE HOY Y PENDIENTES
+  const hoy = new Date().toISOString().split('T')[0];
+  const turnosPendientesHoy = (turnos || []).filter(t =>
+    t.status === 'pendiente' && new Date(t.fecha).toISOString().split('T')[0] === hoy
+  );
+
   return (
-    <Layout className="h-screen">
-      <Sider width={300} className="sider-bar">
-        <h2 className="sider-title">Turnos Pendientes</h2>
-        <Table
-          dataSource={turnos}
-          columns={[
-            { title: 'Código de Reserva', dataIndex: 'cod_reserva', key: 'cod_reserva' },
-            {
-              title: 'Estado',
-              dataIndex: 'status',
-              key: 'status',
-              render: status => {
-                let color = status === 'pendiente' ? 'green' : 'volcano';
-                return <Tag color={color}>{status.toUpperCase()}</Tag>;
-              }
-            }
-          ]}
-          pagination={false}
-          rowKey="id"
-        />
-      </Sider>
-      <Layout>
-        <Content className="main-content">
-          <div className="video-container">
-            <video
-              src={video}
-              autoPlay={true}
-              muted
-              controls
-              className="video-element"
-            />
-            <div className="image-sections">
-              <div className="image-section">
-                {/* <img src={logo} alt="Logo.jpg"/> */}
-              </div>
-              <div className="image-section">Imagen 2</div>
-              <div className="image-section">Imagen 3</div>
-            </div>
-          </div>
-        </Content>
-        <Sider width={300} className="sider-bar-right">
-          <h2 className="sider-title">Turnos en Curso</h2>
-          <Table
-            dataSource={turnoEnCurso}
-            columns={[
-              { title: 'Código de Reserva', dataIndex: 'cod_reserva', key: 'cod_reserva' },
-              { title: 'Usuario', dataIndex: 'user_name', key: 'user_name' },
-            ]}
-            pagination={false}
-            rowKey="id"
+    <div className="pantalla-bg">
+      {/* HEADER CON LOGO */}
+      <header className="pantalla-header">
+        <img src={logo} alt="Urkupiña" className="pantalla-header-logo" style={{width:100,height:70}} />
+      </header>
+
+      {/* BLOQUE PRINCIPAL */}
+      <div className="pantalla-block-figma">
+        <div className="pantalla-block-figma-content">
+          <video
+            src={video}
+            autoPlay
+            muted
+            controls
+            className="pantalla-block-figma-video"
           />
-        </Sider>
-      </Layout>
+          <div className="pantalla-block-figma-tabla">
+            <Table
+              dataSource={turnosPendientesHoy.map((t, i) => ({ ...t, key: i }))}
+              columns={columns}
+              pagination={false}
+              bordered={false}
+              className="pantalla-turnos-table"
+              locale={{ emptyText: "—" }}
+            />
+          </div>
+        </div>
+        {/* SLIDER PUBLICIDAD ABAJO, SOLO IMAGEN */}
+        <footer className="pantalla-footer-slider">
+          <div className="publi-carousel">
+            <AnimatePresence mode="wait">
+              <motion.img
+                key={PUBLICIDADES[currentPubli].id}
+                src={PUBLICIDADES[currentPubli].img}
+                alt="Publicidad"
+                className="publi-slider-img"
+                initial={{ opacity: 0, x: 80 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -80 }}
+                transition={{ duration: 0.7, type: "spring" }}
+              />
+            </AnimatePresence>
+          </div>
+        </footer>
+      </div>
+
+      {/* MODAL TURNO LLAMADO */}
       <Modal
-        title={<span style={{ fontSize: '24px', color: '#333' }}>Turno Llamado</span>}
-        visible={!!turnoLlamado}
+        open={!!turnoLlamado}
+        title="Turno Llamado"
         footer={null}
         centered
         onCancel={() => setTurnoLlamado(null)}
-        style={{
-          backgroundColor: '#f5f5f5',
-          borderRadius: '10px',
-          padding: '20px',
-        }}
       >
         {turnoLlamado && (
-          <>
-            <p style={{ fontSize: '18px', color: '#555', marginBottom: '10px' }}><strong>Código de Reserva:</strong> {turnoLlamado.cod_reserva}</p>
-            <p style={{ fontSize: '18px', color: '#555', marginBottom: '10px' }}><strong>Usuario:</strong> {turnoLlamado.user_name}</p>
-            <p style={{ fontSize: '18px', color: '#555', marginBottom: '10px' }}><strong>Motivo:</strong> {turnoLlamado.motivo}</p>
-            <p style={{ fontSize: '18px', color: '#555', marginBottom: '10px' }}><strong>Estado:</strong> {turnoLlamado.status}</p>
-          </>
+          <div>
+            <p><b>Turno:</b> {turnoLlamado.cod_reserva}</p>
+            <p><b>Caja:</b> {turnoLlamado.caja}</p>
+          </div>
         )}
       </Modal>
-    </Layout>
+    </div>
   );
 };
 
