@@ -6,6 +6,7 @@ import '../css/RegisterUserForm.css';
 const { Option } = Select;
 
 const RegisterUserForm = () => {
+  const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [tipoPropietario, setTipoPropietario] = useState("PROPIETARIO");
   const [uso, setUso] = useState("USO PROPIO");
@@ -17,7 +18,15 @@ const RegisterUserForm = () => {
   const [searchPropietario, setSearchPropietario] = useState('');
   const [selectedPropietario, setSelectedPropietario] = useState(null);
 
-  // Para inquilinos por puesto
+  // Datos del puesto para SOCIO
+  const [socioPuesto, setSocioPuesto] = useState({
+    fila: '',
+    pasillo: '',
+    puesto: '',
+    tamano_puesto: 2,
+  });
+
+  // Para inquilinos por puesto (para propietarios)
   const [puestos, setPuestos] = useState([
     {
       fila: '',
@@ -28,16 +37,15 @@ const RegisterUserForm = () => {
     }
   ]);
 
-  // Buscar propietarios por DNI/email/etc.
+  // Buscar propietarios
   const handleSearchPropietario = async (v) => {
     setSearchPropietario(v);
-    // Simular búsqueda (acá llamá a tu endpoint real)
     if (v.length > 2) {
       try {
         const res = await axios.get('https://xn--urkupia-9za.online/api/users/propietarios', {
           params: { search: v }
         });
-        setPropietarios(res.data); // asumimos array con { id, name, apellido, dni }
+        setPropietarios(res.data); // [{id, name, apellido, dni, fila, pasillo, puesto, tamano_puesto}]
       } catch (err) {
         setPropietarios([]);
       }
@@ -46,7 +54,28 @@ const RegisterUserForm = () => {
     }
   };
 
-  // Cambiar cantidad de puestos y regenerar array
+  // Cuando se selecciona propietario, rellenar los campos del puesto
+  const handleSelectPropietario = (value) => {
+    const propietario = propietarios.find(p => p.id === value);
+    setSelectedPropietario(value);
+    if (propietario) {
+      setSocioPuesto({
+        fila: propietario.fila || '',
+        pasillo: propietario.pasillo || '',
+        puesto: propietario.puesto || '',
+        tamano_puesto: propietario.tamano_puesto || 2,
+      });
+      // También rellenar los valores en el form visual
+      form.setFieldsValue({
+        fila: propietario.fila || '',
+        pasillo: propietario.pasillo || '',
+        puesto: propietario.puesto || '',
+        tamano_puesto: propietario.tamano_puesto || 2,
+      });
+    }
+  };
+
+  // Cambiar cantidad de puestos
   const handleCantidadPuestosChange = (val) => {
     setCantidadPuestos(val);
     let nuevos = [];
@@ -104,23 +133,34 @@ const RegisterUserForm = () => {
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      // Armado del array de puestos
-      const data = {
-        ...values,
-        tipo_propietario: tipoPropietario,
-        uso,
-        puestos: tipoPropietario === 'PROPIETARIO'
-          ? puestos.map((p, idx) => ({
-              ...p,
-              inquilinos: p.inquilinos.map((i, ii) => ({
-                ...i,
-                subletra: p.tamano_puesto === 4 && p.inquilinos.length === 2 ? (ii === 0 ? 'A' : 'B') : undefined
-              }))
+      let data;
+      if (tipoPropietario === 'PROPIETARIO') {
+        data = {
+          ...values,
+          tipo_propietario: tipoPropietario,
+          uso,
+          puestos: puestos.map((p, idx) => ({
+            ...p,
+            inquilinos: p.inquilinos.map((i, ii) => ({
+              ...i,
+              subletra: p.tamano_puesto === 4 && p.inquilinos.length === 2 ? (ii === 0 ? 'A' : 'B') : undefined
             }))
-          : undefined,
-        propietario_asignado: tipoPropietario === 'SOCIO' ? selectedPropietario : undefined,
-        creditos: 20
-      };
+          })),
+          creditos: 20
+        };
+      } else {
+        data = {
+          ...values,
+          tipo_propietario: tipoPropietario,
+          uso,
+          propietario_asignado: selectedPropietario,
+          fila: socioPuesto.fila,
+          pasillo: socioPuesto.pasillo,
+          puesto: socioPuesto.puesto,
+          tamano_puesto: socioPuesto.tamano_puesto,
+          creditos: 20
+        };
+      }
 
       const response = await axios.post('https://xn--urkupia-9za.online/api/users/register', data);
       message.success(response.data.message);
@@ -136,6 +176,7 @@ const RegisterUserForm = () => {
       <div className="registro-card">
         <div className="registro-title">Registro de Usuarios</div>
         <Form
+          form={form}
           name="register_user"
           layout="vertical"
           onFinish={onFinish}
@@ -222,27 +263,59 @@ const RegisterUserForm = () => {
             </Row>
           )}
 
-          {/* Si es inquilino, selector/buscador de propietario */}
+          {/* Si es SOCIO, selector de propietario y campos de puesto */}
           {tipoPropietario === 'SOCIO' && (
-            <Row gutter={16}>
-              <Col xs={24} md={16}>
-                <Form.Item label="Buscar propietario del puesto" required>
-                  <Select
-                    showSearch
-                    placeholder="Buscar propietario por DNI, nombre, etc."
-                    onSearch={handleSearchPropietario}
-                    filterOption={false}
-                    onChange={setSelectedPropietario}
-                  >
-                    {propietarios.map(p => (
-                      <Option key={p.id} value={p.id}>
-                        {p.name} {p.apellido} (DNI: {p.dni})
-                      </Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </Col>
-            </Row>
+            <>
+              <Row gutter={16}>
+                <Col xs={24} md={16}>
+                  <Form.Item label="Buscar propietario del puesto" required>
+                    <Select
+                      showSearch
+                      placeholder="Buscar propietario por DNI, nombre, etc."
+                      onSearch={handleSearchPropietario}
+                      filterOption={false}
+                      onChange={handleSelectPropietario}
+                    >
+                      {propietarios.map(p => (
+                        <Option key={p.id} value={p.id}>
+                          {p.name} {p.apellido} (DNI: {p.dni})
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+              </Row>
+              <Card title="Datos del Puesto" style={{ marginBottom: 16 }}>
+                <Row gutter={12}>
+                  <Col xs={24} md={4}>
+                    <Form.Item label="Fila" name="fila" rules={[{ required: true, message: 'Ingrese la fila' }]}>
+                      <Input value={socioPuesto.fila} onChange={e => setSocioPuesto({ ...socioPuesto, fila: e.target.value })} />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} md={4}>
+                    <Form.Item label="Pasillo" name="pasillo" rules={[{ required: true, message: 'Ingrese el pasillo' }]}>
+                      <Input value={socioPuesto.pasillo} onChange={e => setSocioPuesto({ ...socioPuesto, pasillo: e.target.value })} />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} md={4}>
+                    <Form.Item label="Puesto" name="puesto" rules={[{ required: true, message: 'Ingrese el puesto' }]}>
+                      <Input value={socioPuesto.puesto} onChange={e => setSocioPuesto({ ...socioPuesto, puesto: e.target.value })} />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} md={6}>
+                    <Form.Item label="Tamaño" name="tamano_puesto" rules={[{ required: true, message: 'Seleccione tamaño' }]}>
+                      <Select
+                        value={socioPuesto.tamano_puesto}
+                        onChange={v => setSocioPuesto({ ...socioPuesto, tamano_puesto: v })}
+                      >
+                        <Option value={2}>2 metros</Option>
+                        <Option value={4}>4 metros</Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </Card>
+            </>
           )}
 
           {/* Si es propietario, formulario de puestos */}
