@@ -73,6 +73,7 @@ const UserTable = () => {
     try {
       const res = await fetch('https://xn--urkupia-9za.online/api/users/');
       let data = await res.json();
+      console.log(data)
 
       // Desagrupar si te viene agrupado por propietario
       // (por ejemplo, si el backend te trae algo como [{ name: "Lucas", puestos: [ ... ] }])
