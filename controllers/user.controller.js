@@ -398,6 +398,37 @@ const userRegister = async (req, res) => {
     res.status(500).json({ message: "Error al crear el usuario" });
   }
 };
+// controllers/users.js
+const buscarPropietarios = (req, res) => {
+  const { search } = req.query;
+
+  // Validación básica
+  if (!search || search.length < 3)
+    return res.json([]); // Array vacío si el término es corto
+
+  // Usar LIKE para buscar nombre, apellido o dni similar
+  const query = `
+    SELECT id, name, apellido, dni 
+    FROM users 
+    WHERE tipo_propietario = 'PROPIETARIO'
+      AND (
+        name LIKE ? OR
+        apellido LIKE ? OR
+        dni LIKE ?
+      )
+    LIMIT 15
+  `;
+  const s = `%${search}%`;
+  connection.query(query, [s, s, s], (err, results) => {
+    if (err) {
+      console.error('Error al buscar propietarios:', err);
+      return res.status(500).json([]);
+    }
+    res.json(results);
+  });
+};
+
+
 
 
 
@@ -612,6 +643,7 @@ module.exports = {getAllUsers,
     userUpdate,
     userDelete,
     userRecovery,
-    userBanned}
+    userBanned,
+  buscarPropietarios}
 
 

@@ -8,7 +8,7 @@ const UserRoutes = Express.Router()
 
 //funciones Controladoras
 
-const {getAllUsers,userLogin,userRegister,userUpdate,userDelete, userRecovery, userBanned} = require('../controllers/user.controller')
+const {getAllUsers,userLogin,userRegister,userUpdate,userDelete, userRecovery, userBanned, buscarPropietarios} = require('../controllers/user.controller')
 const adminMiddlewear = require('../middlewears/admin.middlewear')
 
 
@@ -18,6 +18,7 @@ UserRoutes.post('/login',userLogin)
 UserRoutes.post('/register',userRegister)
 UserRoutes.put('/update/:id',userUpdate)
 UserRoutes.post('/recovery',userRecovery)
+UserRoutes.get('/propietarios', buscarPropietarios);
 
 //para usar esta ruta es requerido ser administrador
 UserRoutes.delete('/delete/:id',adminMiddlewear,userDelete)
