@@ -68,13 +68,28 @@ const UserTable = () => {
   const searchInput = useRef(null);
   const [form] = Form.useForm();
 
-  // Carga inicial de datos
+  // --- Cargar datos del backend ---
   const fetchData = async () => {
     try {
       const res = await fetch('https://xn--urkupia-9za.online/api/users/');
-      const data = await res.json();
+      let data = await res.json();
+
+      // Desagrupar si te viene agrupado por propietario
+      // (por ejemplo, si el backend te trae algo como [{ name: "Lucas", puestos: [ ... ] }])
+      // Descomentar y adaptar si lo necesitás:
+      // let newData = [];
+      // data.forEach(user => {
+      //   if (user.puestos && Array.isArray(user.puestos)) {
+      //     user.puestos.forEach(puesto => {
+      //       newData.push({ ...user, ...puesto });
+      //     });
+      //   } else {
+      //     newData.push(user);
+      //   }
+      // });
+      // data = newData;
+
       setDataSource(data);
-      console.log(data)
     } catch (err) {
       console.error('Error al obtener usuarios:', err);
       message.error('No se pudieron cargar los usuarios');
@@ -85,7 +100,7 @@ const UserTable = () => {
     fetchData();
   }, []);
 
-  // Buscador por columna
+  // --- Buscador de columnas ---
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchText(selectedKeys[0]);
@@ -143,7 +158,7 @@ const UserTable = () => {
       ),
   });
 
-  // Actualiza créditos
+  // --- Cargar créditos ---
   const handleSave = async row => {
     try {
       const res = await fetch(
@@ -164,7 +179,7 @@ const UserTable = () => {
     }
   };
 
-  // Suspender / habilitar usuario
+  // --- Cambiar estado (suspender/habilitar) ---
   const updateUserStatus = async (id, newStatus) => {
     try {
       const token = localStorage.getItem('userToken');
@@ -195,7 +210,7 @@ const UserTable = () => {
     }
   };
 
-  // Eliminar usuario
+  // --- Eliminar usuario ---
   const deleteUser = async id => {
     try {
       const token = localStorage.getItem('userToken');
@@ -224,18 +239,32 @@ const UserTable = () => {
     }
   };
 
+  // --- Columnas ---
   const columns = [
     {
       title: 'Nombre',
       dataIndex: 'name',
       key: 'name',
       ...getColumnSearchProps('name'),
+      render: (text, record) => (
+        <span>
+          {text}
+          {record.tipo_propietario === 'INQUILINO' && record.propietario_name
+            ? <span style={{ color: '#888', fontSize: '0.95em' }}> (Inq. de {record.propietario_name})</span>
+            : null}
+        </span>
+      ),
     },
     {
       title: 'Tipo',
       dataIndex: 'tipo_propietario',
       key: 'tipo_propietario',
-      render: tipo => tipo === 'INQUILINO' ? 'Sub Inquilino' : (tipo === 'PROPIETARIO' ? 'Propietario' : tipo),
+      render: tipo =>
+        tipo === 'INQUILINO'
+          ? 'Sub Inquilino'
+          : tipo === 'PROPIETARIO'
+            ? 'Propietario'
+            : tipo,
       filters: [
         { text: 'Propietario', value: 'PROPIETARIO' },
         { text: 'Socio', value: 'SOCIO' },
@@ -299,7 +328,7 @@ const UserTable = () => {
             <Button
               type="dashed"
               onClick={() => updateUserStatus(record.id, 'inactivo')}
-              style={{ borderColor: 'orange', color: 'white', background:"orange" }}
+              style={{ borderColor: 'orange', color: 'white', background: "orange" }}
             >
               Suspender
             </Button>
@@ -324,7 +353,7 @@ const UserTable = () => {
           bordered
           dataSource={dataSource}
           columns={columns}
-          rowKey="id"
+          rowKey={record => `${record.id}-${record.puesto}-${record.tipo_propietario}`}
           pagination={{ pageSize: 10 }}
         />
       </Form>
