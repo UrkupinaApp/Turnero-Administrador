@@ -8,7 +8,7 @@ const Creditos = () => {
 
     <AppLayout>
 
-        <h1>Carga de Creditos</h1>
+        <h1 style={{textAlign:"center",fontSize:"40px"}}>Carga de Creditos</h1>
         <UserTable/>
 
     </AppLayout>

@@ -73,23 +73,6 @@ const UserTable = () => {
     try {
       const res = await fetch('https://xn--urkupia-9za.online/api/users/');
       let data = await res.json();
-      console.log(data)
-
-      // Desagrupar si te viene agrupado por propietario
-      // (por ejemplo, si el backend te trae algo como [{ name: "Lucas", puestos: [ ... ] }])
-      // Descomentar y adaptar si lo necesitás:
-      // let newData = [];
-      // data.forEach(user => {
-      //   if (user.puestos && Array.isArray(user.puestos)) {
-      //     user.puestos.forEach(puesto => {
-      //       newData.push({ ...user, ...puesto });
-      //     });
-      //   } else {
-      //     newData.push(user);
-      //   }
-      // });
-      // data = newData;
-
       setDataSource(data);
     } catch (err) {
       console.error('Error al obtener usuarios:', err);
@@ -347,18 +330,46 @@ const UserTable = () => {
   ];
 
   return (
-    <EditableContext.Provider value={form}>
-      <Form form={form} component={false}>
-        <Table
-          components={{ body: { cell: EditableCell } }}
-          bordered
-          dataSource={dataSource}
-          columns={columns}
-          rowKey={record => `${record.id}-${record.puesto}-${record.tipo_propietario}`}
-          pagination={{ pageSize: 10 }}
-        />
-      </Form>
-    </EditableContext.Provider>
+    <div
+      style={{
+        minHeight: "100%",
+        width: "100vw",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#f9fafb"
+      }}
+    >
+      <div style={{
+        width: "100%",
+        height: "80vh",
+        background: "#fff",
+        borderRadius: "20px",
+        boxShadow: "0 2px 16px rgba(0,0,0,0.07)",
+        padding: 32,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center"
+      }}>
+        <EditableContext.Provider value={form}>
+          <Form form={form} component={false}>
+            <Table
+              components={{ body: { cell: EditableCell } }}
+              bordered
+              dataSource={dataSource}
+              columns={columns}
+              rowKey={record => `${record.id}-${record.puesto}-${record.tipo_propietario}`}
+              pagination={{ pageSize: 10 }}
+              style={{
+                height: "100%",
+                width: "100%",
+              }}
+              scroll={{ y: "55vh" }}
+            />
+          </Form>
+        </EditableContext.Provider>
+      </div>
+    </div>
   );
 };
 

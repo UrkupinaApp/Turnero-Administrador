@@ -9,7 +9,7 @@ import {
   MenuOutlined,
 } from '@ant-design/icons';
 import { useNavigate, Outlet } from 'react-router-dom';
-import FotoPerfil from '../assets/Avatar2.png';
+import FotoPerfil from '../assets/GonzalitoFunko.png';
 import LogoUrkupina from '../assets/LOGONUEVO.png';
 import { useAuthContext } from '../context/AuthContext';
 import '../css/Layout.css';

@@ -1,14 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Table, Input, Button, Tag } from 'antd';
-import io from 'socket.io-client';
+import { io } from 'socket.io-client';
 
-// Configurá tu socket
-const socket = io('https://xn--urkupia-9za.online', {
-  transports: ['websocket'],
-  pingInterval: 25000,
-  pingTimeout: 20000,
-  maxPayload: 1000000
-});
+const socketURL = 'https://xn--urkupia-9za.online';
 
 const columns = [
   { title: 'Nombre', dataIndex: 'user_name', key: 'user_name' },
@@ -29,21 +23,45 @@ const columns = [
   }
 ];
 
-const TurnosTable = ({ locationKey }) => {
+const TurnosTable = () => {
   const [turnos, setTurnos] = useState([]);
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
 
-  useEffect(() => {
-    // Al cambiar de ruta, volver a pedir los turnos
-    socket.emit('obtenerTurnos');
-    const handleTurnos = data => setTurnos(data);
-    socket.on('turnos', handleTurnos);
-    return () => socket.off('turnos', handleTurnos);
-  }, [locationKey]); // <--- Este es el truco
+  // Solo 1 instancia del socket por tabla
+  const socket = useMemo(() => io(socketURL, {
+    transports: ['websocket'],
+    pingInterval: 25000,
+    pingTimeout: 20000,
+    maxPayload: 1000000
+  }), []);
 
-  // Filtro simple
-  const filtered = turnos.filter(t =>
+  useEffect(() => {
+    const handleTurnos = (turnos) => setTurnos(turnos);
+
+    // 1) Siempre pedimos apenas se monta
+    socket.emit('obtenerTurnos');
+
+    // 2) Pedimos cada 2 segundos
+    const interval = setInterval(() => {
+      socket.emit('obtenerTurnos');
+    }, 2000);
+
+    socket.on('connect', () => console.log('Socket conectado!'));
+socket.on('turnos', (turnos) => console.log('Turnos recibidos:', turnos));
+socket.on('connect_error', (err) => console.log('Error conexión socket:', err));
+
+
+    socket.on('turnos', handleTurnos);
+
+    return () => {
+      clearInterval(interval);
+      socket.off('turnos', handleTurnos);
+      socket.disconnect();
+    };
+  }, [socket]);
+
+  const filtered = (turnos || []).filter(t =>
     (!search || t.user_name?.toLowerCase().includes(search.toLowerCase()) || t.cod_reserva?.toLowerCase().includes(search.toLowerCase()))
     && (!status || t.status === status)
   );
