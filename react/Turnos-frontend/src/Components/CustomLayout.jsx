@@ -6,6 +6,7 @@ import {
   HomeOutlined,
   UserOutlined,
   LogoutOutlined,
+  WhatsAppOutlined,
   MenuOutlined,
 } from '@ant-design/icons';
 import { useNavigate, Outlet } from 'react-router-dom';
@@ -23,11 +24,38 @@ const AppLayout = ({ children }) => {
   const [drawerVisible, setDrawerVisible] = useState(false);
 
   const menuItems = [
-    { key: 'turnos', icon: <HomeOutlined />, label: 'Turnos', onClick: () => {navigate('/private/home'); setDrawerVisible(false);} },
-    { key: 'dashboard', icon: <DashboardOutlined />, label: 'Dashboard', onClick: () => {navigate('/private/dashboard'); setDrawerVisible(false);} },
-    { key: 'creditos', icon: <DollarCircleOutlined />, label: 'Créditos', onClick: () => {navigate('/private/creditos'); setDrawerVisible(false);} },
-    { key: 'clientes', icon: <UserOutlined />, label: 'Clientes', onClick: () => {navigate('/private/clientes'); setDrawerVisible(false);} },
+    {
+      key: 'turnos',
+      icon: <HomeOutlined />,
+      label: 'Turnos',
+      onClick: () => { navigate('/private/home'); setDrawerVisible(false); }
+    },
+    {
+      key: 'dashboard',
+      icon: <DashboardOutlined />,
+      label: 'Dashboard',
+      onClick: () => { navigate('/private/dashboard'); setDrawerVisible(false); }
+    },
+    {
+      key: 'creditos',
+      icon: <DollarCircleOutlined />,
+      label: 'Créditos',
+      onClick: () => { navigate('/private/creditos'); setDrawerVisible(false); }
+    },
+    {
+      key: 'clientes',
+      icon: <UserOutlined />,
+      label: 'Clientes',
+      onClick: () => { navigate('/private/clientes'); setDrawerVisible(false); }
+    },
+    {
+      key: 'whatsappbot',
+      icon: <WhatsAppOutlined />,
+      label: 'WhatsApp Bot',
+      onClick: () => { navigate('/private/whatsappbot'); setDrawerVisible(false); }
+    },
   ];
+  
 
   return (
     <Layout style={{ minHeight: '100vh', background: '#f4f6fa' }}>

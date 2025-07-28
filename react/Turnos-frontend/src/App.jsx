@@ -9,6 +9,7 @@ import PublicRouter  from './Routes/PublicRouter';
 import  Creditos  from './Components/Creditos';
 import Clientes from './Components/Clientes';
 import PantallaAtencion from './Components/Pantalla';
+import WhatsAppAuth from './Components/WhatsappAuth';
 
 const App = () => {
   return (
@@ -26,6 +27,7 @@ const App = () => {
             <Route path="/private/home" element={<Home />} />
             <Route path = "/private/creditos" element={<Creditos/>}/>
             <Route path='/private/clientes' element={<Clientes/>}/>
+            <Route path='/private/whatsappbot' element ={<WhatsAppAuth/>}/>
           </Route>
         </Routes>
       
