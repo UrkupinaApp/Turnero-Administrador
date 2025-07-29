@@ -9,7 +9,7 @@ export default function WhatsAppAuth() {
 
   const fetchStatus = async () => {
     try {
-      const res = await fetch('http://ec2-3-14-29-52.us-east-2.compute.amazonaws.com:5000/qr');
+      const res = await fetch('https://3.14.29.52.sslip.io/qr');
       const data = await res.json();
       if (data.authenticated) {
         setConnected(true);
@@ -34,7 +34,7 @@ export default function WhatsAppAuth() {
 
   const handleLogout = async () => {
     try {
-      const res = await fetch('http://ec2-3-14-29-52.us-east-2.compute.amazonaws.com:5000/logout');
+      const res = await fetch('https://3.14.29.52.sslip.io/logout');
       const data = await res.json();
       message.success(data.message || 'Sesión desconectada.');
       setConnected(null);
